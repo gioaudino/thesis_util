@@ -34,14 +34,13 @@ int main(int argc, char** argv){
     unsigned int nodes = nodes_arcs.first;
     unsigned long arcs = nodes_arcs.second;
 
-    std::vector<std::tuple<int,int>> arc_vector;
+    std::vector<std::tuple<long unsigned int,long unsigned int>> arc_vector;
 
     std::ifstream arclist(arclist_file);
 
-    unsigned int x, y, index = 0;
+    long unsigned int x, y;
     while (arclist >> x >> y){
         arc_vector.push_back(std::make_tuple(x,y));
-        index++;
     }
     arclist.close();
     sdsl::k2_tree<2> k2_representation;
