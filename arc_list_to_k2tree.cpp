@@ -5,14 +5,12 @@
 #include <tuple>
 #include <sdsl/int_vector.hpp>
 #include <sdsl/k2_tree.hpp>
-#include <typeinfo>
 
 std::vector<std::string> split(const std::string &s, char delim);
 std::pair<unsigned int,unsigned long> get_nodes_arcs(const std::string basename);
 
 
 int main(int argc, char** argv){
-    const int int_size = 32;
     if(argc < 2){
         std::cout << "Usage: " << argv[0] << " <basename> [<arclist_file>] [<result_filename>]" << std::endl;
         exit(1);
@@ -44,7 +42,7 @@ int main(int argc, char** argv){
         arc_vector.push_back(std::make_tuple(x,y));
     }
     arclist.close();
-    sdsl::k2_tree<2>::bit_vector_type> k2_representation;
+    sdsl::k2_tree<2>> k2_representation;
     k2_representation = sdsl::k2_tree<2>(arc_vector, nodes);
 
     std::ofstream outfile(result_filename);
@@ -52,7 +50,7 @@ int main(int argc, char** argv){
     auto written = k2_representation.serialize(outfile);
     outfile.close();
 
-    std::cout << "Written " << written << " bytes: " << 8*written << " bits";
+    std::cout << "Written " << written << " bytes: " << 8*written << " bits" << std::endl;
 
 }
 std::pair<unsigned int,unsigned long> get_nodes_arcs(const std::string basename){
