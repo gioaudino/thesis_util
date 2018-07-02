@@ -6,6 +6,9 @@
 #include <sdsl/int_vector.hpp>
 #include <sdsl/k2_tree.hpp>
 
+void push_arc_to_stream(std::ostream out, long unsigned int x, long unsigned int y);
+std::vector<std::string> split(const std::string &s, char delim);
+
 int main(int argc, char** argv){
     if(argc < 3){
         std::cout << "Usage: " << argv[0] << " <k2compressed_filename> <nodes> [<result_filename>]" << std::endl;
@@ -13,14 +16,14 @@ int main(int argc, char** argv){
     }
     auto input_name = split(argv[1], '.');
     std::string result_filename(input_name[input_name.size()-2]);
-    unsigned int nodes = argv[2];
+    unsigned int nodes = std::stoi(argv[2]);
 
-    if(argc ==4){
+    if(argc == 4){
         result_filename = argv[3];
     }
     std::ifstream in_k2(argv[1]);
 
-    sdsl::k2_tree<2>> k2;
+    sdsl::k2_tree<2> k2;
     k2.load(in_k2);
 
     long unsigned int x;
