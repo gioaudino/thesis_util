@@ -43,8 +43,8 @@ int main(int argc, char** argv){
         arc_vector.push_back(std::make_tuple(x,y));
     }
     arclist.close();
-    sdsl::k2_tree<2> k2_representation;
-    k2_representation = sdsl::k2_tree<2>(arc_vector, nodes);
+    sdsl::k2_tree<2, sdsl::bit_vector, sdsl::rank_support_v<1,1>::bit_vector_type> k2_representation;
+    k2_representation = sdsl::k2_tree<2, sdsl::bit_vector, sdsl::rank_support_v<1,1>::bit_vector_type>(arc_vector, nodes);
 
     std::ofstream outfile(result_filename);
 
