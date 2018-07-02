@@ -44,11 +44,11 @@ int main(int argc, char** argv){
         index++;
     }
     arclist.close();
-    sdsl::k2_tree<2, sdsl::bit_vector, sdsl::rank_support_v> k2_representation = k2_tree<2, sdsl::bit_vector, sdsl::rank_support_v>(arc_vector, nodes);
+    sdsl::k2_tree<2, sdsl::bit_vector, sdsl::rank_support_v> k2_representation = sdsl::k2_tree<2, sdsl::bit_vector, sdsl::rank_support_v>(arc_vector, nodes);
 
     std::ofstream outfile(result_filename);
 
-    auto written = k2k2_representation.serialize(outfile);
+    auto written = k2_representation.serialize(outfile);
     outfile.close();
 
     std::cout << "Written " << written << " bytes: " << 8*written << " bits";
