@@ -2,26 +2,40 @@
 #include <fstream>
 #include <vector>
 #include <sstream>
+#include <tuple>
 #include <sdsl/int_vector.hpp>
+#include <sdsl/k2_tree.hpp>
 
 std::vector<std::string> split(const std::string &s, char delim);
-unsigned long get_arcs(const std::string basename);
+std::pair<unsigned int,unsigned long> get_nodes_arcs(const std::string basename);
 
 
 int main(int argc, char** argv){
     const int int_size = 32;
     if(argc < 2){
-        std::cout << "Usage: " << argv[0] << " <basename>" << std::endl;
+        std::cout << "Usage: " << argv[0] << " <basename> [<arclist_file>] [<result_filename>]" << std::endl;
         exit(1);
     }
-
     std::string arclist_file(argv[1]);
     arclist_file.append(".arclist");
 
-    unsigned long arcs = get_arcs(argv[1]);
+    std::string result_filename(argv[1]);
+    result_filename.append(".k2compressed");
+
+    if(argc == 4){
+        arclist_file = argv[2];
+        result_filename = argv[3];
+    }
+    if(argc ==3){
+        result_filename = argv[2];
+    }
+
+    auto nodes_arcs = get_nodes_arcs(argv[1]);
+    unsigned int nodes = nodes_arcs.first;
+    unsigned long arcs = nodes_arcs.second;
 
     std::vector<std::tuple<int,int>> arc_vector;
-    
+
     std::ifstream arclist(arclist_file);
 
     unsigned int x, y, index = 0;
@@ -30,12 +44,17 @@ int main(int argc, char** argv){
         index++;
     }
     arclist.close();
+    sdsl::k2_tree<2, sdsl::bit_vector, sdsl::rank_support_v> k2_representation = k2_tree<2, sdsl::bit_vector, sdsl::rank_support_v>(arc_vector, nodes);
 
+    std::ofstream outfile(result_filename);
 
+    auto written = k2k2_representation.serialize(outfile);
+    outfile.close();
 
+    std::cout << "Written " << written << " bytes: " << 8*written << " bits";
 
 }
-unsigned long get_arcs(const std::string basename){
+std::pair<unsigned int,unsigned long> get_nodes_arcs(const std::string basename){
     std::string properties_file(basename);
     properties_file.append(".properties");
     std::ifstream properties(properties_file);
@@ -43,15 +62,18 @@ unsigned long get_arcs(const std::string basename){
     std::string line;
     std::vector<std::string> elems;
     unsigned long arcs;
+    unsigned int nodes;
     while(properties >> line){
         elems = split(line, '=');
         if(elems[0].compare("arcs") == 0){
-            arcs = atol(elems[1].c_str());
-            break;
+            arcs = std::stol(elems[1]);
+        }
+        if(elems[0].compare("nodes") == 0){
+            nodes = std::stoi(elems[1]);
         }
     }
     properties.close();
-    return arcs;
+    return std::make_pair(nodes, arcs);
 }
 std::vector<std::string> split(const std::string &s, char delim) {
     std::stringstream ss(s);
