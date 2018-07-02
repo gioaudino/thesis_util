@@ -21,8 +21,7 @@ int main(int argc, char** argv){
     unsigned long arcs = get_arcs(argv[1]);
 
     std::vector<std::tuple<int,int>> arc_vector;
-
-    sdsl::int_vector<int_size> fst = sdsl::int_vector<int_
+    
     std::ifstream arclist(arclist_file);
 
     unsigned int x, y, index = 0;
@@ -32,7 +31,7 @@ int main(int argc, char** argv){
     }
     arclist.close();
 
-    
+
 
 
 }
