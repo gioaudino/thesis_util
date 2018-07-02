@@ -6,7 +6,6 @@
 #include <sdsl/int_vector.hpp>
 #include <sdsl/k2_tree.hpp>
 
-void push_arc_to_stream(std::ostream out, long unsigned int x, long unsigned int y);
 std::vector<std::string> split(const std::string &s, char delim);
 
 int main(int argc, char** argv){
@@ -29,21 +28,18 @@ int main(int argc, char** argv){
     long unsigned int x;
     int index;
 
-    std::ofstream out_stream(result_filename);
+    std::ofstream out(result_filename);
 
     for(x = 0; x < nodes; x++){
         auto neighbors = k2.neigh(x);
         for(index = 0; index < neighbors.size(); index++){
-            push_arc_to_stream(out_stream, x, neighbors[index]);
+            out << x << '\t' << neighbors[index] << std::endl;
         }
     }
     out_stream.close();
 
 }
 
-void push_arc_to_stream(std::ostream out, long unsigned int x, long unsigned int y){
-    out << x << '\t' << y << std::endl;
-}
 
 std::vector<std::string> split(const std::string &s, char delim) {
     std::stringstream ss(s);
