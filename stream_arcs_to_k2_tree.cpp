@@ -8,7 +8,7 @@ std::pair<unsigned int,unsigned long> get_nodes_arcs(const std::string basename)
 
 int main(int argc, char** argv){
     if(argc < 2){
-        std::cout << "Usage: " << argv[0] << "<output>" << std::endl;
+        std::cout << "Usage: " << argv[0] << "<output> [<original_basename>]" << std::endl;
         exit(1);
     }
 
@@ -23,21 +23,25 @@ int main(int argc, char** argv){
     k2 = sdsl::k2_tree<2>(arc_vector, max+1);
 
     std::ofstream outfile(argv[1]);
-    std::string prop(argv[1]);
-    prop.append(".properties");
+
 
     auto written = k2.serialize(outfile);
     outfile.close();
 
-    std::ofstream properties_out(prop);
-    auto nodes_arcs = get_nodes_arcs(argv[1]);
-    unsigned int nodes = nodes_arcs.first;
-    unsigned long arcs = nodes_arcs.second;
+    if(argc ==3){
+        std::string prop(argv[1]);
+        prop.append(".properties");
+        std::ofstream properties_out(prop);
+        auto nodes_arcs = get_nodes_arcs(argv[2]);
+        unsigned int nodes = nodes_arcs.first;
+        unsigned long arcs = nodes_arcs.second;
 
-    properties_out << "arcs=" << arcs << std::endl;
-    properties_out << "nodes=" << nodes << std::endl;
+        properties_out << "arcs=" << arcs << std::endl;
+        properties_out << "nodes=" << nodes << std::endl;
 
-    properties_out.close();
+        properties_out.close();
+
+    }
 
     std::cout << "Written " << written << " bytes: " << 8*written << " bits" << std::endl;
 }
