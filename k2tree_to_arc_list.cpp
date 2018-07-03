@@ -3,7 +3,6 @@
 #include <vector>
 #include <sstream>
 #include <tuple>
-#include <sdsl/int_vector.hpp>
 #include <sdsl/k2_tree.hpp>
 
 std::vector<std::string> split(const std::string &s, char delim);
