@@ -13,10 +13,11 @@ int main(int argc, char** argv){
     }
 
     std::vector<std::tuple<long unsigned int,long unsigned int>> arc_vector;
-    long unsigned int x, y, max = 0;
+    long unsigned int x, y, max = 0, index = 0;
     while (std::cin >> x >> y){
         arc_vector.push_back(std::make_tuple(x,y));
         max = std::max(max, std::max(x,y));
+        index++;
     }
 
     sdsl::k2_tree<2> k2;
@@ -28,20 +29,22 @@ int main(int argc, char** argv){
     auto written = k2.serialize(outfile);
     outfile.close();
 
+    unsigned int nodes;
+    unsigned long arcs;
+    std::string prop(argv[1]);
+    prop.append(".properties");
+    std::ofstream properties_out(prop);
     if(argc ==3){
-        std::string prop(argv[1]);
-        prop.append(".properties");
-        std::ofstream properties_out(prop);
         auto nodes_arcs = get_nodes_arcs(argv[2]);
-        unsigned int nodes = nodes_arcs.first;
-        unsigned long arcs = nodes_arcs.second;
-
-        properties_out << "arcs=" << arcs << std::endl;
-        properties_out << "nodes=" << nodes << std::endl;
-
-        properties_out.close();
-
+        nodes = nodes_arcs.first;
+        arcs = nodes_arcs.second;
+    } else {
+        nodes = max+1;
+        arcs = index;
     }
+    properties_out << "arcs=" << arcs << std::endl;
+    properties_out << "nodes=" << nodes << std::endl;
+    properties_out.close();
 
     std::cout << "Written " << written << " bytes: " << 8*written << " bits" << std::endl;
 }
