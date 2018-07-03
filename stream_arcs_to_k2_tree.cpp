@@ -47,7 +47,9 @@ int main(int argc, char** argv){
     properties_out << "nodes=" << nodes << std::endl;
     properties_out.close();
 
-    std::cout << "Written " << written << " bytes: " << 8*written << " bits" << std::endl;
+    double bpe = 8*written/arcs;
+
+    std::cout << "Written " << written << " bytes: " << 8*written << " bits - " << std::setprecision(3) << bpe << " bpe" << std::endl;
 }
 
 std::pair<unsigned int,unsigned long> get_nodes_arcs(const std::string basename){
