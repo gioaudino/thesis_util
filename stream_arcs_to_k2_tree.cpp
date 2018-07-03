@@ -5,12 +5,12 @@
 
 
 int main(int argc, char** argv){
-    if(argc < 3){
-        std::cout << "Usage: " << argv[0] << " <arc_list_stream> <output>" << std::endl;
+    if(argc < 2){
+        std::cout << "Usage: " << argv[0] << "<output>" << std::endl;
         exit(1);
     }
 
-    std::ifstream input(argv[1]);
+    std::istream input;
     std::vector<std::tuple<long unsigned int,long unsigned int>> arc_vector;
     long unsigned int x, y, max = 0;
     while (input >> x >> y){
@@ -24,7 +24,7 @@ int main(int argc, char** argv){
 
     std::ofstream outfile(argv[2]);
 
-    auto written = k2_representation.serialize(outfile);
+    auto written = k2.serialize(outfile);
     outfile.close();
 
     std::cout << "Written " << written << " bytes: " << 8*written << " bits" << std::endl;
