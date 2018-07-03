@@ -10,14 +10,12 @@ int main(int argc, char** argv){
         exit(1);
     }
 
-    std::istream input;
     std::vector<std::tuple<long unsigned int,long unsigned int>> arc_vector;
     long unsigned int x, y, max = 0;
-    while (input >> x >> y){
+    while (std::cin >> x >> y){
         arc_vector.push_back(std::make_tuple(x,y));
         max = std::max(max, std::max(x,y));
     }
-    input.close();
 
     sdsl::k2_tree<2> k2;
     k2 = sdsl::k2_tree<2>(arc_vector, max+1);
