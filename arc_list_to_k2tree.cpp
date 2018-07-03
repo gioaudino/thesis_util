@@ -50,6 +50,15 @@ int main(int argc, char** argv){
     auto written = k2_representation.serialize(outfile);
     outfile.close();
 
+    std::string prop(result_filename);
+    prop.append(".properties");
+    std::ofstream properties_out(prop);
+    properties_out << "arcs=" << arcs << std::endl;
+    properties_out << "nodes=" << nodes << std::endl;
+
+    properties_out.close();
+
+
     std::cout << "Written " << written << " bytes: " << 8*written << " bits" << std::endl;
 
 }
