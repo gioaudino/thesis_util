@@ -3,6 +3,7 @@
 #include <sstream>
 #include <vector>
 #include <sdsl/k2_tree.hpp>
+#include <ctime>
 
 std::vector<std::string> split(const std::string &s, char delim);
 std::pair<unsigned int,unsigned long> get_nodes_arcs(const std::string basename);
@@ -50,6 +51,8 @@ int main(int argc, char** argv){
     double bpe = 8*written/arcs;
 
     std::cout << "Written " << written << " bytes: " << 8*written << " bits - " << std::setprecision(3) << bpe << " bpe" << std::endl;
+    time_t t = time(0);
+    std::cout << "Finished at " << ctime(&t) << std::endl;
 }
 
 std::pair<unsigned int,unsigned long> get_nodes_arcs(const std::string basename){
