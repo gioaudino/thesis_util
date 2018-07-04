@@ -37,6 +37,7 @@ int main(int argc, char** argv){
         }
         x_vector.set_int(index*int_len, x, int_len);
         y_vector.set_int(index*int_len, y, int_len);
+        index++;
     }
 
     std::cout << "Streaming completed. Serializing vectors" << std::endl;
