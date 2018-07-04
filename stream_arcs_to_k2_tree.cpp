@@ -16,10 +16,30 @@ int main(int argc, char** argv){
 
     std::vector<std::tuple<long unsigned int,long unsigned int>> arc_vector;
     long unsigned int x, y, max = 0, index = 0;
-    while (std::cin >> x >> y){
-        arc_vector.push_back(std::make_tuple(x,y));
-        max = std::max(max, std::max(x,y));
-        index++;
+
+    unsigned int nodes;
+    unsigned long arcs;
+
+    if(argc == 3){
+        auto nodes_arcs = get_nodes_arcs(argv[2]);
+        nodes = nodes_arcs.first;
+        arcs = nodes_arcs.second;
+    }
+
+    if(argc == 3){
+        arc_vector = std::vector<std::tuple<long unsigned int, long unsigned int>>(arcs);
+        while (std::cin >> x >> y){
+            arc_vector[index++] = std::make_tuple(x,y);
+            max = std::max(max, std::max(x,y));
+        }
+    } else {
+        while (std::cin >> x >> y){
+            arc_vector.push_back(std::make_tuple(x,y));
+            max = std::max(max, std::max(x,y));
+            index++;
+        }
+           nodes = max+1;
+           arcs = index;
     }
 
     sdsl::k2_tree<2> k2;
@@ -31,24 +51,18 @@ int main(int argc, char** argv){
     auto written = k2.serialize(outfile);
     outfile.close();
 
-    unsigned int nodes;
-    unsigned long arcs;
+
+
+    double bpe = 8*written/arcs;
+
     std::string prop(argv[1]);
     prop.append(".properties");
     std::ofstream properties_out(prop);
-    if(argc ==3){
-        auto nodes_arcs = get_nodes_arcs(argv[2]);
-        nodes = nodes_arcs.first;
-        arcs = nodes_arcs.second;
-    } else {
-        nodes = max+1;
-        arcs = index;
-    }
+
     properties_out << "arcs=" << arcs << std::endl;
     properties_out << "nodes=" << nodes << std::endl;
+    properties_out << "bitsperlink=" << bpe << std::endl;
     properties_out.close();
-
-    double bpe = 8*written/arcs;
 
     std::cout << "Written " << written << " bytes: " << 8*written << " bits - " << std::setprecision(3) << bpe << " bpe" << std::endl;
     time_t t = time(0);
