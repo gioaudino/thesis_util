@@ -41,8 +41,14 @@ int main(int argc, char** argv){
 
     std::cout << "Streaming completed. Serializing vectors" << std::endl;
 
-    std::ofstream x_stream(argv[1]+".x");
-    std::ofstream y_stream(argv[1]+".y");
+    std::str x_n(argv[1]);
+    x_n.append(".x");
+
+    std::str y_n(argv[1]);
+    y_n.append(".y");
+
+    std::ofstream x_stream(x_n);
+    std::ofstream y_stream(y_n);
 
     x_vector.serialize(x_stream);
     y_vector.serialize(y_stream);
@@ -57,7 +63,7 @@ int main(int argc, char** argv){
     properties_out << "arcs=" << arcs << std::endl;
     properties_out << "nodes=" << nodes << std::endl;
 
-    std::cout << "Written " << written << " bytes: " << 8*written << " bits - " << bpe << " bpe" << std::endl;
+    std::cout << "Written " << written << " bytes: " << 8*written << " bits" << std::endl;
     time_t t = time(0);
     std::cout << "Finished at " << ctime(&t) << std::endl;
 }
