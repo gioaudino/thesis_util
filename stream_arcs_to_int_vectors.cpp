@@ -27,7 +27,7 @@ int main(int argc, char** argv){
     x_vector = sdsl::int_vector<int_len>(arcs, 0);
     y_vector = sdsl::int_vector<int_len>(arcs, 0);
 
-    long unsigned int index = 0;
+    long unsigned int x, y, index = 0;
     time_t now;
 
     while (std::cin >> x >> y){
@@ -41,17 +41,17 @@ int main(int argc, char** argv){
 
     std::cout << "Streaming completed. Serializing vectors" << std::endl;
 
-    std::str x_n(argv[1]);
+    std::string x_n(argv[1]);
     x_n.append(".x");
 
-    std::str y_n(argv[1]);
+    std::string y_n(argv[1]);
     y_n.append(".y");
 
     std::ofstream x_stream(x_n);
     std::ofstream y_stream(y_n);
 
-    x_vector.serialize(x_stream);
-    y_vector.serialize(y_stream);
+    long unsigned int x_w = x_vector.serialize(x_stream);
+    long unsigned int y_w = y_vector.serialize(y_stream);
 
     x_stream.close();
     y_stream.close();
@@ -63,7 +63,7 @@ int main(int argc, char** argv){
     properties_out << "arcs=" << arcs << std::endl;
     properties_out << "nodes=" << nodes << std::endl;
 
-    std::cout << "Written " << written << " bytes: " << 8*written << " bits" << std::endl;
+    std::cout << "Written " << x_w+y_w << " bytes: " << 8*(x_w+y_w) << " bits" << std::endl;
     time_t t = time(0);
     std::cout << "Finished at " << ctime(&t) << std::endl;
 }
