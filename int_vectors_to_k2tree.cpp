@@ -23,6 +23,8 @@ int main(int argc, char** argv){
     nodes = nodes_arcs.first;
     arcs = nodes_arcs.second;
 
+    std::cout << "Will try to use files " << argv[1] << ".x and " << argv[1] << ".y - This graphs has " << nodes << " nodes and " << arcs << " arcs" << std::endl;
+
     sdsl::k2_tree<2> k2 = sdsl::k2_tree<2>(argv[1], nodes);
 
     std::string output(argv[1]);
