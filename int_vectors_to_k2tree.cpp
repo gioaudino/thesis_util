@@ -23,15 +23,15 @@ int main(int argc, char** argv){
     nodes = nodes_arcs.first;
     arcs = nodes_arcs.second;
 
-    sdsl::k2_tree<2> k2 = sdsl::l2_tree<2>(argv[1], nodes);
+    sdsl::k2_tree<2> k2 = sdsl::k2_tree<2>(argv[1], nodes);
 
     std::string output(argv[1]);
     output.append(".k2");
 
-    std::ofstream(output);
-    
-    auto written = k2.serialize(output);
-    output.close();
+    std::ofstream out(output);
+
+    auto written = k2.serialize(out);
+    out.close();
 
     double bpe = 8*written/arcs;
 
