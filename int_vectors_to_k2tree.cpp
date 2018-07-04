@@ -19,7 +19,7 @@ int main(int argc, char** argv){
 
     unsigned int nodes;
     unsigned long arcs;
-    auto nodes_arcs = get_nodes_arcs(argv[2]);
+    auto nodes_arcs = get_nodes_arcs(argv[1]);
     nodes = nodes_arcs.first;
     arcs = nodes_arcs.second;
 
