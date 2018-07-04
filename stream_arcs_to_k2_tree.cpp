@@ -29,6 +29,10 @@ int main(int argc, char** argv){
     if(argc == 3){
         arc_vector = std::vector<std::tuple<long unsigned int, long unsigned int>>(arcs);
         while (std::cin >> x >> y){
+            if(index % 1000000 == 0){
+                time_t now = time(0);
+                std::cout << ctime(&now) << "\t" << index << "/" << arcs << " arcs - " << 100*index/arcs << "%%" << std::endl;
+            }
             arc_vector[index++] = std::make_tuple(x,y);
             max = std::max(max, std::max(x,y));
         }
