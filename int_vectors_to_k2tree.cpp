@@ -25,9 +25,11 @@ int main(int argc, char** argv){
 
     std::cout << "Will try to use files " << argv[1] << ".x and " << argv[1] << ".y - This graphs has " << nodes << " nodes and " << arcs << " arcs" << std::endl;
 
-    sdsl::k2_tree<2> k2 = sdsl::k2_tree<2>(argv[1], nodes);
+    std::string input(argv[1]);
 
-    std::string output(argv[1]);
+    sdsl::k2_tree<2> k2 = sdsl::k2_tree<2>(input, nodes);
+
+    std::string output(input);
     output.append(".k2");
 
     std::ofstream out(output);
