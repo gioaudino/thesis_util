@@ -59,7 +59,7 @@ int main(int argc, char** argv){
     x_stream.close();
     y_stream.close();
 
-    std::string prop(argv[1]);
+    std::string prop(argv[2]);
     prop.append(".properties");
     std::ofstream properties_out(prop);
 
