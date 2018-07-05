@@ -19,27 +19,30 @@ int main(int argc, char** argv){
 
     unsigned int nodes;
     unsigned long arcs;
-    auto nodes_arcs = get_nodes_arcs(argv[1]);
+    std::string input(argv[1]);
+    auto nodes_arcs = get_nodes_arcs(input);
     nodes = nodes_arcs.first;
     arcs = nodes_arcs.second;
 
-    std::cout << "Will try to use files " << argv[1] << ".x and " << argv[1] << ".y - This graphs has " << nodes << " nodes and " << arcs << " arcs" << std::endl;
 
-    std::string input(argv[1]);
+    std::cout << "Will try to use files " << input << ".x and " << input << ".y - This graphs has " << nodes << " nodes and " << arcs << " arcs" << std::endl;
 
-    sdsl::k2_tree<2> k2 = sdsl::k2_tree<2>(input, nodes);
 
-    std::string output(input);
-    output.append(".k2");
 
-    std::ofstream out(output);
-
-    auto written = k2.serialize(out);
-    out.close();
+    // sdsl::k2_tree<2> k2 = sdsl::k2_tree<2>(input, 0);
+    //
+    // std::string output(input);
+    // output.append(".k2");
+    //
+    // std::ofstream out(output);
+    //
+    // auto written = k2.serialize(out);
+    // out.close();
+    auto written = 2;
 
     double bpe = 8*written/arcs;
 
-    std::string prop(argv[1]);
+    std::string prop(input);
     prop.append(".properties");
     std::ofstream properties_out(prop);
 
