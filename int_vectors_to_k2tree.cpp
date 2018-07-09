@@ -28,15 +28,14 @@ int main(int argc, char** argv){
     std::cout << "Will try to use files " << input << ".x and " << input << ".y - This graphs has " << nodes << " nodes and " << arcs << " arcs" << std::endl;
 
     sdsl::k2_tree<2> k2 = sdsl::k2_tree<2>(input);
-    //
-    // std::string output(input);
-    // output.append(".k2");
-    //
-    // std::ofstream out(output);
-    //
-    // auto written = k2.serialize(out);
-    // out.close();
-    auto written = 2;
+
+    std::string output(input);
+    output.append(".k2");
+
+    std::ofstream out(output);
+
+    auto written = k2.serialize(out);
+    out.close();
 
     int th_bpe = 1000*8*written/arcs;
     double bpe = bpe/1000;

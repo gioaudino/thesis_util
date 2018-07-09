@@ -4,6 +4,7 @@
 #include <vector>
 #include <sdsl/k2_tree.hpp>
 #include <ctime>
+#include <stxxl>
 
 std::vector<std::string> split(const std::string &s, char delim);
 std::pair<unsigned int,unsigned long> get_nodes_arcs(const std::string basename);
@@ -14,7 +15,7 @@ int main(int argc, char** argv){
         exit(1);
     }
 
-    std::vector<std::tuple<long unsigned int,long unsigned int>> arc_vector;
+    stxxl::vector<std::tuple<long unsigned int,long unsigned int>> arc_vector;
     long unsigned int x, y, max = 0, index = 0;
 
     unsigned int nodes;
@@ -24,9 +25,6 @@ int main(int argc, char** argv){
         auto nodes_arcs = get_nodes_arcs(argv[2]);
         nodes = nodes_arcs.first;
         arcs = nodes_arcs.second;
-    }
-
-    if(argc == 3){
         arc_vector = std::vector<std::tuple<long unsigned int, long unsigned int>>(arcs);
         while (std::cin >> x >> y){
             if(index % 1000000 == 0){
@@ -45,6 +43,8 @@ int main(int argc, char** argv){
            nodes = max+1;
            arcs = index;
     }
+
+    std::cout << "Vector filled. Now creating k2_tree" << std::endl;
 
     sdsl::k2_tree<2> k2;
     k2 = sdsl::k2_tree<2>(arc_vector, max+1);
