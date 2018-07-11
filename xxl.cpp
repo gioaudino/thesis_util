@@ -40,17 +40,15 @@ int main(int argc, char** argv){
             max = std::max(max, std::max(x,y));
             index++;
         }
-           nodes = max+1;
-           arcs = index;
+        nodes = max+1;
+        arcs = index;
     }
 
     std::cout << "Vector filled. Now printing " << std::endl;
 
-    stxxl::vector::iterator iter = arc_vector.begin();
-    while(*iter){
-        std::tuple<long unsigned int, long unsigned int> element = *iter;
-        std::cerr << std::get<0>(element) << '\t' << std::get<1>(element) << std::endl;
-        iter++;
+    int index;
+    for(index = 0; index < arc_vector.size(); index++){
+        std::cerr << std::get<0>(arc_vector[index]) << '\t' << std::get<1>(arc_vector[index]) << std::endl;
     }
 
 
