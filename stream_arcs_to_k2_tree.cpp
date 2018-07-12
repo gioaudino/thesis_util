@@ -4,7 +4,7 @@
 #include <vector>
 #include <sdsl/k2_tree.hpp>
 #include <ctime>
-#include <stxxl>
+#include <stxxl.h>
 
 std::vector<std::string> split(const std::string &s, char delim);
 std::pair<unsigned int,unsigned long> get_nodes_arcs(const std::string basename);
@@ -25,7 +25,7 @@ int main(int argc, char** argv){
         auto nodes_arcs = get_nodes_arcs(argv[2]);
         nodes = nodes_arcs.first;
         arcs = nodes_arcs.second;
-        arc_vector = std::vector<std::tuple<long unsigned int, long unsigned int>>(arcs);
+        arc_vector = stxxl::vector<std::tuple<long unsigned int, long unsigned int>>(arcs);
         while (std::cin >> x >> y){
             if(index % 1000000 == 0){
                 time_t now = time(0);
