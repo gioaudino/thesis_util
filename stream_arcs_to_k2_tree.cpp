@@ -51,12 +51,8 @@ int main(int argc, char** argv){
 
     std::ofstream outfile(argv[1]);
 
-
     auto written = k2.serialize(outfile);
     outfile.close();
-
-
-
     double bpe = 8*written/arcs;
 
     std::string prop(argv[1]);

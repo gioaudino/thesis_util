@@ -6,19 +6,26 @@
 #include <sdsl/k2_tree.hpp>
 
 std::vector<std::string> split(const std::string &s, char delim);
+std::pair<unsigned int,unsigned long> get_nodes_arcs(const std::string basename);
 
 int main(int argc, char** argv){
-    if(argc < 3){
-        std::cout << "Usage: " << argv[0] << " <k2compressed_filename> <nodes> [<result_filename>]" << std::endl;
+    if(argc < 2){
+        std::cout << "Usage: " << argv[0] << " <k2_compressed_basename> [<result_filename>]" << std::endl;
         exit(1);
     }
-    auto input_name = split(argv[1], '.');
-    std::string result_filename(input_name[input_name.size()-2]);
-    unsigned int nodes = std::stoi(argv[2]);
 
-    if(argc == 4){
-        result_filename = argv[3];
+    std::string result_filename(argv[1]);
+    result_filename.append(".arclist")
+
+    if(argc == 3){
+        result_filename = argv[2];
     }
+    unsigned int nodes;
+    unsigned long arcs;
+    auto nodes_arcs = get_nodes_arcs(argv[1]);
+    nodes = nodes_arcs.first;
+    arcs = nodes_arcs.second;
+
     std::ifstream in_k2(argv[1]);
 
     sdsl::k2_tree<2> k2;
@@ -35,10 +42,32 @@ int main(int argc, char** argv){
             out << x << '\t' << neighbors[index] << std::endl;
         }
     }
-    out_stream.close();
+    out.close();
 
 }
 
+
+std::pair<unsigned int,unsigned long> get_nodes_arcs(const std::string basename){
+    std::string properties_file(basename);
+    properties_file.append(".properties");
+    std::ifstream properties(properties_file);
+
+    std::string line;
+    std::vector<std::string> elems;
+    unsigned long arcs;
+    unsigned int nodes;
+    while(properties >> line){
+        elems = split(line, '=');
+        if(elems[0].compare("arcs") == 0){
+            arcs = std::stol(elems[1]);
+        }
+        if(elems[0].compare("nodes") == 0){
+            nodes = std::stoi(elems[1]);
+        }
+    }
+    properties.close();
+    return std::make_pair(nodes, arcs);
+}
 
 std::vector<std::string> split(const std::string &s, char delim) {
     std::stringstream ss(s);
