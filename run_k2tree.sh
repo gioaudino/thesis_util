@@ -1,4 +1,4 @@
-#! /bin/sh
+#! /bin/bash
 
 if [[ $# -lt 3 ]]; then
     echo "Usage: $0 <path_to_scripts> <BVGraph_basename> <output_basename>"

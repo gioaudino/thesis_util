@@ -23,12 +23,7 @@ int main(int argc, char** argv){
     nodes = nodes_arcs.first;
     arcs = nodes_arcs.second;
 
-    bool debug = true;
-    if(argc == 4){
-        std::string param(argv[3]);
-        if(param.compare("--no-output"))
-        debug = false;
-    }
+    bool debug = argc != 4;
 
     sdsl::int_vector<int_len> x_vector, y_vector;
     x_vector = sdsl::int_vector<int_len>(arcs, 0);

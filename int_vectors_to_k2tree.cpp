@@ -16,12 +16,7 @@ int main(int argc, char** argv){
         std::cout << "Usage: " << argv[0] << "<output> [--no-output]" << std::endl;
         exit(1);
     }
-    bool debug = true;
-    if(argc == 3){
-        std::string param(argv[2]);
-        if(param.compare("--no-output"))
-        debug = false;
-    }
+    bool debug = argc != 3;
 
     unsigned int nodes;
     unsigned long arcs;
@@ -43,8 +38,7 @@ int main(int argc, char** argv){
     double written = k2.serialize(out);
     out.close();
 
-    int th_bpe = (int) ((double) 1000*8*written/arcs);
-    double bpe = bpe/1000;
+    double bpe = ()(double)(written*8))/arcs;
 
     std::string prop(input);
     prop.append(".properties");
@@ -55,7 +49,7 @@ int main(int argc, char** argv){
     properties_out << "bitsperlink=" << bpe << std::endl;
     properties_out.close();
     if(debug){
-        std::cout << "Written " << written << " bytes: " << 8*written << " bits - " << bpe << " bpe" << std::endl;
+        std::cout << "Written " << written << " bytes: " << (double) 8*written << " bits - " << bpe << " bpe" << std::endl;
         time_t t = time(0);
         std::cout << "Finished at " << ctime(&t) << std::endl;
     }
