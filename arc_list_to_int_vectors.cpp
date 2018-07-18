@@ -13,7 +13,7 @@ int main(int argc, char** argv){
     const int int_len = 32;
 
     if(argc < 4){
-        std::cout << "Usage: " << argv[0] << "<input> <output> <original_basename>" << std::endl;
+        std::cout << "Usage: " << argv[0] << "<input> <output> <original_basename> [--no-output]" << std::endl;
         exit(1);
     }
 
@@ -22,6 +22,11 @@ int main(int argc, char** argv){
     auto nodes_arcs = get_nodes_arcs(argv[3]);
     nodes = nodes_arcs.first;
     arcs = nodes_arcs.second;
+
+    bool debug = true;
+    if(argc == 3 && argv[2].compare("--no-output"))
+        debug = false;
+
 
     sdsl::int_vector<int_len> x_vector, y_vector;
     x_vector = sdsl::int_vector<int_len>(arcs, 0, int_len);
@@ -41,8 +46,8 @@ int main(int argc, char** argv){
         index++;
     }
     input.close();
-
-    std::cout << "Streaming completed. Serializing vectors" << std::endl;
+    if(debug)
+        std::cout << "Streaming completed. Serializing vectors" << std::endl;
 
     std::string x_n(argv[2]);
     x_n.append(".x");
@@ -65,39 +70,39 @@ int main(int argc, char** argv){
 
     properties_out << "arcs=" << arcs << std::endl;
     properties_out << "nodes=" << nodes << std::endl;
-
-    std::cout << "Written " << x_w+y_w << " bytes: " << 8*(x_w+y_w) << " bits" << std::endl;
-    time_t t = time(0);
-    std::cout << "Finished at " << ctime(&t) << std::endl;
-}
-
-std::pair<unsigned int,unsigned long> get_nodes_arcs(const std::string basename){
-    std::string properties_file(basename);
-    properties_file.append(".properties");
-    std::ifstream properties(properties_file);
-
-    std::string line;
-    std::vector<std::string> elems;
-    unsigned long arcs;
-    unsigned int nodes;
-    while(properties >> line){
-        elems = split(line, '=');
-        if(elems[0].compare("arcs") == 0){
-            arcs = std::stol(elems[1]);
-        }
-        if(elems[0].compare("nodes") == 0){
-            nodes = std::stoi(elems[1]);
-        }
+    if(debug){
+        std::cout << "Written " << x_w+y_w << " bytes: " << 8*(x_w+y_w) << " bits" << std::endl;
+        time_t t = time(0);
+        std::cout << "Finished at " << ctime(&t) << std::endl;}
     }
-    properties.close();
-    return std::make_pair(nodes, arcs);
-}
-std::vector<std::string> split(const std::string &s, char delim) {
-    std::stringstream ss(s);
-    std::string item;
-    std::vector<std::string> elems;
-    while (std::getline(ss, item, delim)) {
-        elems.push_back(std::move(item));
+
+    std::pair<unsigned int,unsigned long> get_nodes_arcs(const std::string basename){
+        std::string properties_file(basename);
+        properties_file.append(".properties");
+        std::ifstream properties(properties_file);
+
+        std::string line;
+        std::vector<std::string> elems;
+        unsigned long arcs;
+        unsigned int nodes;
+        while(properties >> line){
+            elems = split(line, '=');
+            if(elems[0].compare("arcs") == 0){
+                arcs = std::stol(elems[1]);
+            }
+            if(elems[0].compare("nodes") == 0){
+                nodes = std::stoi(elems[1]);
+            }
+        }
+        properties.close();
+        return std::make_pair(nodes, arcs);
     }
-    return elems;
-}
+    std::vector<std::string> split(const std::string &s, char delim) {
+        std::stringstream ss(s);
+        std::string item;
+        std::vector<std::string> elems;
+        while (std::getline(ss, item, delim)) {
+            elems.push_back(std::move(item));
+        }
+        return elems;
+    }

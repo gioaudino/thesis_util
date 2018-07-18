@@ -13,7 +13,7 @@ int main(int argc, char** argv){
     const int int_len = 32;
 
     if(argc < 3){
-        std::cout << "Usage: " << argv[0] << "<output> <original_basename>" << std::endl;
+        std::cout << "Usage: " << argv[0] << "<output> <original_basename> [--no-output]" << std::endl;
         exit(1);
     }
 
@@ -23,6 +23,10 @@ int main(int argc, char** argv){
     nodes = nodes_arcs.first;
     arcs = nodes_arcs.second;
 
+    bool debug = true;
+    if(argc == 4 && argv[3].compare("--no-output"))
+        debug = false;
+
     sdsl::int_vector<int_len> x_vector, y_vector;
     x_vector = sdsl::int_vector<int_len>(arcs, 0);
     y_vector = sdsl::int_vector<int_len>(arcs, 0);
@@ -31,15 +35,17 @@ int main(int argc, char** argv){
     time_t now;
 
     while (std::cin >> x >> y){
-        if(index % 1000000 == 0){
-            now = time(0);
-            std::cout << ctime(&now) << "\t" << index << "/" << arcs << " arcs - " << 100*index/arcs << "%%" << std::endl;
+        if(debug){
+            if(index % 1000000 == 0){
+                now = time(0);
+                std::cout << ctime(&now) << "\t" << index << "/" << arcs << " arcs - " << 100*index/arcs << "%%" << std::endl;
+            }
         }
         x_vector.set_int(index*int_len, x, int_len);
         y_vector.set_int(index*int_len, y, int_len);
         index++;
     }
-
+    if(debug)
     std::cout << "Streaming completed. Serializing vectors" << std::endl;
 
     std::string x_n(argv[1]);
@@ -63,10 +69,11 @@ int main(int argc, char** argv){
 
     properties_out << "arcs=" << arcs << std::endl;
     properties_out << "nodes=" << nodes << std::endl;
-
-    std::cout << "Written " << x_w+y_w << " bytes: " << 8*(x_w+y_w) << " bits" << std::endl;
-    time_t t = time(0);
-    std::cout << "Finished at " << ctime(&t) << std::endl;
+    if(debug){
+        std::cout << "Written " << x_w+y_w << " bytes: " << 8*(x_w+y_w) << " bits" << std::endl;
+        time_t t = time(0);
+        std::cout << "Finished at " << ctime(&t) << std::endl;
+    }
 }
 
 std::pair<unsigned int,unsigned long> get_nodes_arcs(const std::string basename){

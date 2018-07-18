@@ -13,9 +13,12 @@ int main(int argc, char** argv){
     const int int_len = 32;
 
     if(argc < 2){
-        std::cout << "Usage: " << argv[0] << "<output>" << std::endl;
+        std::cout << "Usage: " << argv[0] << "<output> [--no-output]" << std::endl;
         exit(1);
     }
+    bool debug = true;
+    if(argc == 3 && argv[2].compare("--no-output"))
+        debug = false;
 
     unsigned int nodes;
     unsigned long arcs;
@@ -24,8 +27,8 @@ int main(int argc, char** argv){
     nodes = nodes_arcs.first;
     arcs = nodes_arcs.second;
 
-
-    std::cout << "Will try to use files " << input << ".x and " << input << ".y - This graphs has " << nodes << " nodes and " << arcs << " arcs" << std::endl;
+    if(debug)
+        std::cout << "Will try to use files " << input << ".x and " << input << ".y - This graphs has " << nodes << " nodes and " << arcs << " arcs" << std::endl;
 
     sdsl::k2_tree<2> k2 = sdsl::k2_tree<2>(input);
 
@@ -34,10 +37,10 @@ int main(int argc, char** argv){
 
     std::ofstream out(output);
 
-    auto written = k2.serialize(out);
+    double written = k2.serialize(out);
     out.close();
 
-    int th_bpe = 1000*8*written/arcs;
+    int th_bpe = (int) ((double) 1000*8*written/arcs);
     double bpe = bpe/1000;
 
     std::string prop(input);
@@ -48,11 +51,11 @@ int main(int argc, char** argv){
     properties_out << "nodes=" << nodes << std::endl;
     properties_out << "bitsperlink=" << bpe << std::endl;
     properties_out.close();
-
-    std::cout << "Written " << written << " bytes: " << 8*written << " bits - " << bpe << " bpe" << std::endl;
-    time_t t = time(0);
-    std::cout << "Finished at " << ctime(&t) << std::endl;
-
+    if(debug){
+        std::cout << "Written " << written << " bytes: " << 8*written << " bits - " << bpe << " bpe" << std::endl;
+        time_t t = time(0);
+        std::cout << "Finished at " << ctime(&t) << std::endl;
+    }
 }
 
 std::pair<unsigned int,unsigned long> get_nodes_arcs(const std::string basename){
