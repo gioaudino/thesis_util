@@ -15,7 +15,7 @@ int main(int argc, char** argv){
         exit(1);
     }
 
-    std::vector<std::tuple<long unsigned int,long unsigned int>> arc_vector;
+    stxxl::vector<std::tuple<long unsigned int,long unsigned int>> arc_vector;
     long unsigned int x, y, max = 0, index = 0;
 
     unsigned int nodes;
@@ -25,7 +25,7 @@ int main(int argc, char** argv){
         auto nodes_arcs = get_nodes_arcs(argv[2]);
         nodes = nodes_arcs.first;
         arcs = nodes_arcs.second;
-        arc_vector = std::vector<std::tuple<long unsigned int, long unsigned int>>(arcs);
+        arc_vector = stxxl::vector<std::tuple<long unsigned int, long unsigned int>>(arcs);
         while (std::cin >> x >> y){
             if(index % 1000000 == 0){
                 time_t now = time(0);
