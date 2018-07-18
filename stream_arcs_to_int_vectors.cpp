@@ -24,8 +24,11 @@ int main(int argc, char** argv){
     arcs = nodes_arcs.second;
 
     bool debug = true;
-    if(argc == 4 && argv[3].compare("--no-output"))
+    if(argc == 4){
+        std::string param(argv[3]);
+        if(param.compare("--no-output"))
         debug = false;
+    }
 
     sdsl::int_vector<int_len> x_vector, y_vector;
     x_vector = sdsl::int_vector<int_len>(arcs, 0);
@@ -35,18 +38,16 @@ int main(int argc, char** argv){
     time_t now;
 
     while (std::cin >> x >> y){
-        if(debug){
-            if(index % 1000000 == 0){
-                now = time(0);
-                std::cout << ctime(&now) << "\t" << index << "/" << arcs << " arcs - " << 100*index/arcs << "%%" << std::endl;
-            }
+        if(debug && index % 1000000 == 0){
+            now = time(0);
+            std::cout << ctime(&now) << "\t" << index << "/" << arcs << " arcs - " << 100*index/arcs << "%%" << std::endl;
         }
         x_vector.set_int(index*int_len, x, int_len);
         y_vector.set_int(index*int_len, y, int_len);
         index++;
     }
     if(debug)
-    std::cout << "Streaming completed. Serializing vectors" << std::endl;
+        std::cout << "Streaming completed. Serializing vectors" << std::endl;
 
     std::string x_n(argv[1]);
     x_n.append(".x");

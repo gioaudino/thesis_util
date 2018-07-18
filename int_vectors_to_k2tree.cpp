@@ -17,8 +17,11 @@ int main(int argc, char** argv){
         exit(1);
     }
     bool debug = true;
-    if(argc == 3 && argv[2].compare("--no-output"))
+    if(argc == 3){
+        std::string param(argv[2]);
+        if(param.compare("--no-output"))
         debug = false;
+    }
 
     unsigned int nodes;
     unsigned long arcs;
