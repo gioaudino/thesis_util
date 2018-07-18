@@ -38,7 +38,7 @@ int main(int argc, char** argv){
     double written = k2.serialize(out);
     out.close();
 
-    double bpe = ()(double)(written*8))/arcs;
+    double bpe = ((double)(written*8))/arcs;
 
     std::string prop(input);
     prop.append(".properties");
