@@ -24,6 +24,14 @@ int main(int argc, char** argv){
     auto nodes_arcs = get_nodes_arcs(argv[2]);
     nodes = nodes_arcs.first;
     arcs = nodes_arcs.second;
+
+    std::string prop(argv[1]);
+    prop.append(".properties");
+    std::ofstream properties_out(prop);
+
+    properties_out << "arcs=" << arcs << std::endl;
+    properties_out << "nodes=" << nodes << std::endl;
+
     arc_vector = std::vector<std::tuple<long unsigned int, long unsigned int>>(arcs);
     while (std::cin >> x >> y){
         if(index % 1000000 == 0){
@@ -37,31 +45,45 @@ int main(int argc, char** argv){
     std::ofstream outfile(output_basename);
 
     // START MEASURING COMPRESSION TIME
-    std::clock_t c_start = std::clock();
+    std::clock_t time_start = std::clock();
     sdsl::k2_tree<2> k2;
     k2 = sdsl::k2_tree<2>(arc_vector, nodes);
 
     auto written = k2.serialize(outfile);
     // END OF COMPRESSION TIME MEASURE
-    std::clock_t c_end = std::clock();
-    long double total_time = 1000*(c_end - c_start) / CLOCKS_PER_SEC;
+    std::clock_t time_end = std::clock();
+    long double compression_time = get_cpu_time(time_start, time_end);
 
     outfile.close();
     double bpe = 8*written/arcs;
-
-    std::string prop(argv[1]);
-    prop.append(".properties");
-    std::ofstream properties_out(prop);
-
-    properties_out << "arcs=" << arcs << std::endl;
-    properties_out << "nodes=" << nodes << std::endl;
+    std::setprecision(3);
     properties_out << "bitsperlink=" << bpe << std::endl;
-    properties_out << "compression_time=" << std::setprecision(3) << total_time << " ms" << std::endl;
+    properties_out << "compression_time=" << compression_time << " ms" << std::endl;
+
+    long unsigned int keep = 0;
+
+    time_start = std::clock();
+    for(index = 0; index < nodes; index++){
+        for(long unsigned int node: k2.neigh(index)){
+            keep ^= node;
+        }
+    }
+    time_end = std::clock();
+    long double sequential_scan_time = get_cpu_time(time_start, time_end);
+    properties_out << "sequential_scan_time=" << sequential_scan_time << " ms" << std::endl;
+
     properties_out.close();
 
-    std::cout << "Written " << written << " bytes: " << 8*written << " bits - " << std::endl << '\t' << bpe << " bpe " << total_time << " ms" << std::endl;
+    std::cout << std::endl << "Written " << written << " bytes: " << 8*written << " bits - " << std::endl;
+    std::cout << '\t' << bpe << " bpe"<< std::endl;
+    std::cout << "compression time: " << compression_time << " ms - sequential scan time: " << std::endl;
     time_t t = time(0);
     std::cout << "Finished at " << ctime(&t) << std::endl;
+}
+
+long double get_cpu_time(std::clock_t time_start, std::clock_t time_end){
+    long double cpu_time = 1000*(time_start - time_end) / CLOCKS_PER_SEC;
+    return cpu_time;
 }
 
 std::pair<unsigned int,unsigned long> get_nodes_arcs(const std::string basename){
