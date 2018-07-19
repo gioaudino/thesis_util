@@ -17,7 +17,7 @@ int main(int argc, char** argv){
 
     std::vector<std::tuple<long unsigned int,long unsigned int>> arc_vector;
     long unsigned int x, y, index = 0;
-    
+
     unsigned int nodes;
     unsigned long arcs;
 
@@ -42,9 +42,9 @@ int main(int argc, char** argv){
 
     auto written = k2.serialize(outfile);
     // END OF COMPRESSION TIME MEASURE
-    long double total_time = (c_end - c_start) / CLOCKS_PER_SEC;
-
     std::clock_t c_end = std::clock();
+    long double total_time = (c_end - c_start) / CLOCKS_PER_SEC;
+    
     outfile.close();
     double bpe = 8*written/arcs;
 
