@@ -10,48 +10,47 @@ std::vector<std::string> split(const std::string &s, char delim);
 std::pair<unsigned int,unsigned long> get_nodes_arcs(const std::string basename);
 
 int main(int argc, char** argv){
-    if(argc < 2){
-        std::cout << "Usage: " << argv[0] << "<output> [<original_basename>]" << std::endl;
+    if(argc < 3){
+        std::cout << "Usage: " << argv[0] << "<output> <original_basename> [--silent]" << std::endl;
         exit(1);
     }
 
     std::vector<std::tuple<long unsigned int,long unsigned int>> arc_vector;
-    long unsigned int x, y, max = 0, index = 0;
+    long unsigned int x, y, index = 0;
+    bool silent = false;
 
+    if(argc == 4){
+        std::string silent(argv[3]);
+        if(silent.compare("--silent") == 0)
+            silent = true;
+    }
     unsigned int nodes;
     unsigned long arcs;
 
-    if(argc == 3){
-        auto nodes_arcs = get_nodes_arcs(argv[2]);
-        nodes = nodes_arcs.first;
-        arcs = nodes_arcs.second;
-        arc_vector = std::vector<std::tuple<long unsigned int, long unsigned int>>(arcs);
-        while (std::cin >> x >> y){
-            if(index % 1000000 == 0){
-                time_t now = time(0);
-                std::cout << ctime(&now) << "\t" << index << "/" << arcs << " arcs - " << 100*index/arcs << "%%" << std::endl;
-            }
-            arc_vector[index++] = std::make_tuple(x,y);
-            max = std::max(max, std::max(x,y));
+    auto nodes_arcs = get_nodes_arcs(argv[2]);
+    nodes = nodes_arcs.first;
+    arcs = nodes_arcs.second;
+    arc_vector = std::vector<std::tuple<long unsigned int, long unsigned int>>(arcs);
+    while (std::cin >> x >> y){
+        if(index % 1000000 == 0){
+            time_t now = time(0);
+            std::cout << ctime(&now) << "\t" << index << "/" << arcs << " arcs - " << 100*index/arcs << "%%" << std::endl;
         }
-    } else {
-        while (std::cin >> x >> y){
-            arc_vector.push_back(std::make_tuple(x,y));
-            max = std::max(max, std::max(x,y));
-            index++;
-        }
-           nodes = max+1;
-           arcs = index;
+        arc_vector[index++] = std::make_tuple(x,y);
     }
-
-    std::cout << "Vector filled. Now creating k2_tree" << std::endl;
-
-    sdsl::k2_tree<2> k2;
-    k2 = sdsl::k2_tree<2>(arc_vector, max+1);
 
     std::ofstream outfile(argv[1]);
 
+    // START MEASURING COMPRESSION TIME
+    std::clock_t c_start = std::clock();
+    sdsl::k2_tree<2> k2;
+    k2 = sdsl::k2_tree<2>(arc_vector, max+1);
+
     auto written = k2.serialize(outfile);
+    // END OF COMPRESSION TIME MEASURE
+    long double total_time = (c_end - c_start) / CLOCKS_PER_SEC;
+
+    std::clock_t c_end = std::clock();
     outfile.close();
     double bpe = 8*written/arcs;
 
@@ -62,9 +61,10 @@ int main(int argc, char** argv){
     properties_out << "arcs=" << arcs << std::endl;
     properties_out << "nodes=" << nodes << std::endl;
     properties_out << "bitsperlink=" << bpe << std::endl;
+    properties_out << "compression_time" << std::setprecision(3) << total_time << " s" << std::endl;
     properties_out.close();
 
-    std::cout << "Written " << written << " bytes: " << 8*written << " bits - " << std::setprecision(3) << bpe << " bpe" << std::endl;
+    std::cout << "Written " << written << " bytes: " << 8*written << " bits - " << std::endl << '\t' << bpe << " bpe " << total_time << " s" << std::endl;
     time_t t = time(0);
     std::cout << "Finished at " << ctime(&t) << std::endl;
 }
