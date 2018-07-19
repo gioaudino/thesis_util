@@ -8,6 +8,7 @@
 
 std::vector<std::string> split(const std::string &s, char delim);
 std::pair<unsigned int,unsigned long> get_nodes_arcs(const std::string basename);
+long double get_cpu_time(std::clock_t time_start, std::clock_t time_end);
 
 int main(int argc, char** argv){
     if(argc < 3){
