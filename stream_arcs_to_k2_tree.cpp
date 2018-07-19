@@ -11,19 +11,13 @@ std::pair<unsigned int,unsigned long> get_nodes_arcs(const std::string basename)
 
 int main(int argc, char** argv){
     if(argc < 3){
-        std::cout << "Usage: " << argv[0] << "<output> <original_basename> [--silent]" << std::endl;
+        std::cout << "Usage: " << argv[0] << "<output> <original_basename>" << std::endl;
         exit(1);
     }
 
     std::vector<std::tuple<long unsigned int,long unsigned int>> arc_vector;
     long unsigned int x, y, index = 0;
-    bool silent = false;
-
-    if(argc == 4){
-        std::string silent(argv[3]);
-        if(silent.compare("--silent") == 0)
-            silent = true;
-    }
+    
     unsigned int nodes;
     unsigned long arcs;
 
@@ -44,7 +38,7 @@ int main(int argc, char** argv){
     // START MEASURING COMPRESSION TIME
     std::clock_t c_start = std::clock();
     sdsl::k2_tree<2> k2;
-    k2 = sdsl::k2_tree<2>(arc_vector, max+1);
+    k2 = sdsl::k2_tree<2>(arc_vector, nodes);
 
     auto written = k2.serialize(outfile);
     // END OF COMPRESSION TIME MEASURE
