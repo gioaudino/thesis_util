@@ -28,7 +28,7 @@ int main(int argc, char** argv){
     while (std::cin >> x >> y){
         if(index % 1000000 == 0){
             time_t now = time(0);
-            std::cout << ctime(&now) << "\t" << index << "/" << arcs << " arcs - " << 100*index/arcs << "%%" << std::endl;
+            std::cout << ctime(&now) << "\t" << index << "/" << arcs << " arcs - " << 100*index/arcs << "\%" << std::endl;
         }
         arc_vector[index++] = std::make_tuple(x,y);
     }
@@ -43,8 +43,8 @@ int main(int argc, char** argv){
     auto written = k2.serialize(outfile);
     // END OF COMPRESSION TIME MEASURE
     std::clock_t c_end = std::clock();
-    long double total_time = (c_end - c_start) / CLOCKS_PER_SEC;
-    
+    long double total_time = 1000*(c_end - c_start) / CLOCKS_PER_SEC;
+
     outfile.close();
     double bpe = 8*written/arcs;
 
@@ -55,10 +55,10 @@ int main(int argc, char** argv){
     properties_out << "arcs=" << arcs << std::endl;
     properties_out << "nodes=" << nodes << std::endl;
     properties_out << "bitsperlink=" << bpe << std::endl;
-    properties_out << "compression_time" << std::setprecision(3) << total_time << " s" << std::endl;
+    properties_out << "compression_time=" << std::setprecision(3) << total_time << " ms" << std::endl;
     properties_out.close();
 
-    std::cout << "Written " << written << " bytes: " << 8*written << " bits - " << std::endl << '\t' << bpe << " bpe " << total_time << " s" << std::endl;
+    std::cout << "Written " << written << " bytes: " << 8*written << " bits - " << std::endl << '\t' << bpe << " bpe " << total_time << " ms" << std::endl;
     time_t t = time(0);
     std::cout << "Finished at " << ctime(&t) << std::endl;
 }
