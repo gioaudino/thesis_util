@@ -11,7 +11,7 @@ std::pair<unsigned int,unsigned long> get_nodes_arcs(const std::string basename)
 
 int main(int argc, char** argv){
     if(argc < 3){
-        std::cout << "Usage: " << argv[0] << "<output> <original_basename>" << std::endl;
+        std::cout << "Usage: " << argv[0] << "<output_basename> <original_basename>" << std::endl;
         exit(1);
     }
 
@@ -32,8 +32,9 @@ int main(int argc, char** argv){
         }
         arc_vector[index++] = std::make_tuple(x,y);
     }
-
-    std::ofstream outfile(argv[1]);
+    std::string output_basename(argv[1]);
+    output_basename.append(".k2");
+    std::ofstream outfile(output_basename);
 
     // START MEASURING COMPRESSION TIME
     std::clock_t c_start = std::clock();
