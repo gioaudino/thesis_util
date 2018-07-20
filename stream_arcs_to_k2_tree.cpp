@@ -4,11 +4,11 @@
 #include <vector>
 #include <sdsl/k2_tree.hpp>
 #include <ctime>
-#include <stxxl.h>
+#include <math.h>
 
 std::vector<std::string> split(const std::string &s, char delim);
 std::pair<unsigned int,unsigned long> get_nodes_arcs(const std::string basename);
-long double get_cpu_time(std::clock_t time_start, std::clock_t time_end);
+long double get_cpu_time(std::clock_t time_start, std::clock_t time_end, unsigned int precision = 3);
 
 int main(int argc, char** argv){
     if(argc < 3){
@@ -45,6 +45,8 @@ int main(int argc, char** argv){
     output_basename.append(".k2");
     std::ofstream outfile(output_basename);
 
+    std::cout << "Graph loaded. Compressing..." << std::endl;
+
     // START MEASURING COMPRESSION TIME
     std::clock_t time_start = std::clock();
     sdsl::k2_tree<2> k2;
@@ -55,6 +57,11 @@ int main(int argc, char** argv){
     std::clock_t time_end = std::clock();
     long double compression_time = get_cpu_time(time_start, time_end);
 
+
+    std::cout << "Graph compressed in " << compression_time << " ms" << std::endl;
+
+
+
     outfile.close();
     double bpe = 8*written/arcs;
     std::setprecision(3);
@@ -63,6 +70,8 @@ int main(int argc, char** argv){
 
     long unsigned int keep = 0;
 
+    std::cout << "Analyzing sequential scan" << std::endl;
+
     time_start = std::clock();
     for(index = 0; index < nodes; index++){
         for(long unsigned int node: k2.neigh(index)){
@@ -70,20 +79,25 @@ int main(int argc, char** argv){
         }
     }
     time_end = std::clock();
-    long double sequential_scan_time = get_cpu_time(time_start, time_end);
-    properties_out << "sequential_scan_time=" << sequential_scan_time << " ms" << std::endl;
+    long double sequential_scan_time = get_cpu_time(time_start, time_end, 6)/arcs;
+
+    std::cout << "Sequential scan completed: " << sequential_scan_time << " ns per link" << std::endl;
+
+
+    properties_out << "sequential_scan_time=" << sequential_scan_time << " ns/link" << std::endl;
 
     properties_out.close();
 
     std::cout << std::endl << "Written " << written << " bytes: " << 8*written << " bits - " << std::endl;
     std::cout << '\t' << bpe << " bpe"<< std::endl;
-    std::cout << "compression time: " << compression_time << " ms - sequential scan time: " << std::endl;
+    std::cout << "compression time: " << compression_time << " ms - sequential scan time: " sequential_scan_time << " ns/link" << std::endl;
     time_t t = time(0);
     std::cout << "Finished at " << ctime(&t) << std::endl;
 }
 
-long double get_cpu_time(std::clock_t time_start, std::clock_t time_end){
-    long double cpu_time = 1000*(time_start - time_end) / CLOCKS_PER_SEC;
+long double get_cpu_time(std::clock_t time_start, std::clock_t time_end, unsigned int precision){
+    unsigned int prec = pow(10, precision);
+    long double cpu_time = prec*(time_end - time_start) / CLOCKS_PER_SEC;
     return cpu_time;
 }
 
