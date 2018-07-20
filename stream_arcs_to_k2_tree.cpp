@@ -90,7 +90,7 @@ int main(int argc, char** argv){
 
     std::cout << std::endl << "Written " << written << " bytes: " << 8*written << " bits - " << std::endl;
     std::cout << '\t' << bpe << " bpe"<< std::endl;
-    std::cout << "compression time: " << compression_time << " ms - sequential scan time: " sequential_scan_time << " ns/link" << std::endl;
+    std::cout << "compression time: " << compression_time << " ms - sequential scan time: " << sequential_scan_time << " ns/link" << std::endl;
     time_t t = time(0);
     std::cout << "Finished at " << ctime(&t) << std::endl;
 }
