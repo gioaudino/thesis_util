@@ -7,9 +7,12 @@ fi
 
 goto=$PWD
 cd $1
-b++ stream_arcs_to_int_vectors.cpp & b++ int_vectors_to_k2tree.cpp
+git pull;
+rm stream_arcs_to_k2tree.out
+b++ stream_arcs_to_k2tree.cpp
+compile=$?
 cd $goto
-
-java it.unimi.dsi.webgraph.ArcListASCIIGraph $2 >($1/stream_arcs_to_int_vectors.out $3 $2 --no-output);
-
-time $1/int_vectors_to_k2tree.out $3 --no-output
+if [compile -eq 0]; then
+    java it.unimi.dsi.webgraph.ArcListASCIIGraph $2 >($1/stream_arcs_to_k2tree.out $3 $2);
+    time $1/int_vectors_to_k2tree.out $3 --no-output
+fi
