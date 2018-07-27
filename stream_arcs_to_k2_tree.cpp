@@ -5,11 +5,18 @@
 #include <sdsl/k2_tree.hpp>
 #include <ctime>
 #include <math.h>
+#include <cstdlib>
+#include <random>
 
 std::vector<std::string> split(const std::string &s, char delim);
 std::pair<unsigned int,unsigned long> get_nodes_arcs(const std::string basename);
 long double get_cpu_time(std::clock_t time_start, std::clock_t time_end, unsigned int precision = 3);
+std::vector<double> create_out_degree_array(sdsl::k2_tree, long unsigned int nodes);
+int get_proportionally_random_node(std::vector<double> out_degrees);
+int double_binary_search(std::vector<double> out_degrees, int left, int right, double target);
+double get_variance(std::vector<int> times, double average);
 
+const std::vector<int> counts = {10,100,1000,10000};
 int main(int argc, char** argv){
     if(argc < 3){
         std::cout << "Usage: " << argv[0] << "<output_basename> <original_basename>" << std::endl;
@@ -60,8 +67,6 @@ int main(int argc, char** argv){
 
     std::cout << "Graph compressed in " << compression_time << " ms" << std::endl;
 
-
-
     outfile.close();
     double bpe = 8*written/arcs;
     std::setprecision(3);
@@ -82,12 +87,40 @@ int main(int argc, char** argv){
     long double sequential_scan_time = get_cpu_time(time_start, time_end, 6)/arcs;
 
     std::cout << "Sequential scan completed: " << sequential_scan_time << " ns per link" << std::endl;
-
-
     properties_out << "sequential_scan_time=" << sequential_scan_time << " ns/link" << std::endl;
 
-    properties_out.close();
 
+    std::cout << "Analyzing list scan with randomly selected nodes" << std::endl;
+
+    std::random_device seed;
+    std::mt19937 gen(seed());
+    std::uniform_int_distribution<int> dist(0, nodes);
+
+    for(int count: counts){
+        std::vector<unsigned int> times(count,0);
+        for(int c = 0; c < count; c++){
+            unsigned int node = dist(gen);
+            time_start = std::clock();
+            for(long unsigned int n: k2.neigh(node)){
+                keep ^= n;
+            }
+            time_end = std::clock();
+            times[c] = get_cpu_time(time_start, time_end, 6);
+        }
+        int sum = 0;
+        std::for_each(times.begin(), times.end(), [&] (int val) {
+            sum +=val;
+        });
+        double avg = val/count;
+        double variance = get_variance(times, avg);
+        std::cout << "Random scan @ " << count << endl;
+        std::cout << "avg: " << avg << " ns" << " - variance: " << variance << " - std dev: " << sqrt(variance) << std::endl;
+        properties_out << "random_" << count << "_avg=" << avg << " ns" << endl;
+        properties_out << "random_" << count << "_variance=" << variance << endl;
+        properties_out << "random_" << count << "_stddev=" << sqrt(variance) << endl;
+    }
+
+    properties_out.close();
     std::cout << std::endl << "Written " << written << " bytes: " << 8*written << " bits - " << std::endl;
     std::cout << '\t' << bpe << " bpe"<< std::endl;
     std::cout << "compression time: " << compression_time << " ms - sequential scan time: " << sequential_scan_time << " ns/link" << std::endl;
@@ -130,4 +163,36 @@ std::vector<std::string> split(const std::string &s, char delim) {
         elems.push_back(std::move(item));
     }
     return elems;
+}
+
+std::vector<double> create_out_degree_array(sdsl::k2_tree tree, unsigned int nodes, unsigned long arcs){
+    std::vector<double> out_degrees(nodes, 0);
+    int index, sum = 0;
+    for(index = 0; index < nodes; index++){
+        sum += tree.neigh(index).size()
+        out_degrees[index] = sum/arcs;
+    }
+    return out_degrees;
+}
+
+int get_proportionally_random_node(std::vector<double> out_degrees){
+    srand(time(NULL));
+    double target = rand()/RAND_MAX;
+    return double_binary_search(out_degrees, 0, out_degrees.size(), target);
+}
+
+int double_binary_search(std::vector<double> out_degrees, int left, int right, double target){
+    int mid = (right-left)/2;
+    if (out_degrees[mid] == target) return mid;
+    if (out_degrees[mid] < target && out_degrees[mid+1] > target) return mid+1;
+    if (target < out_degrees[mid]) return double_binary_search(out_degrees, left, mid, target);
+    return double_binary_search(out_degrees, mid, right, target);
+}
+
+double get_variance(std::vector<int> times, double average){
+    int sum = 0;
+    for(int tim: times){
+        sum += pow(tim-average, 2);
+    }
+    return sum/(times.size()-1);
 }
