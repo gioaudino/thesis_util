@@ -11,10 +11,10 @@
 std::vector<std::string> split(const std::string &s, char delim);
 std::pair<unsigned int,unsigned long> get_nodes_arcs(const std::string basename);
 long double get_cpu_time(std::clock_t time_start, std::clock_t time_end, unsigned int precision = 3);
-std::vector<double> create_out_degree_array(sdsl::k2_tree, long unsigned int nodes);
+std::vector<double> create_out_degree_array(sdsl::k2_tree<2> tree, unsigned int nodes, unsigned long arcs);
 int get_proportionally_random_node(std::vector<double> out_degrees);
 int double_binary_search(std::vector<double> out_degrees, int left, int right, double target);
-double get_variance(std::vector<int> times, double average);
+double get_variance(std::vector<unsigned int> times, double average);
 
 const std::vector<int> counts = {10,100,1000,10000};
 int main(int argc, char** argv){
@@ -111,13 +111,13 @@ int main(int argc, char** argv){
         std::for_each(times.begin(), times.end(), [&] (int val) {
             sum +=val;
         });
-        double avg = val/count;
+        double avg = sum/count;
         double variance = get_variance(times, avg);
         std::cout << "Random scan @ " << count << endl;
         std::cout << "avg: " << avg << " ns" << " - variance: " << variance << " - std dev: " << sqrt(variance) << std::endl;
-        properties_out << "random_" << count << "_avg=" << avg << " ns" << endl;
-        properties_out << "random_" << count << "_variance=" << variance << endl;
-        properties_out << "random_" << count << "_stddev=" << sqrt(variance) << endl;
+        properties_out << "random_" << count << "_avg=" << avg << " ns" << std::endl;
+        properties_out << "random_" << count << "_variance=" << variance << std::endl;
+        properties_out << "random_" << count << "_stddev=" << sqrt(variance) << std::endl;
     }
 
     properties_out.close();
@@ -165,7 +165,7 @@ std::vector<std::string> split(const std::string &s, char delim) {
     return elems;
 }
 
-std::vector<double> create_out_degree_array(sdsl::k2_tree tree, unsigned int nodes, unsigned long arcs){
+std::vector<double> create_out_degree_array(sdsl::k2_tree<2> tree, unsigned int nodes, unsigned long arcs){
     std::vector<double> out_degrees(nodes, 0);
     int index, sum = 0;
     for(index = 0; index < nodes; index++){
@@ -189,7 +189,7 @@ int double_binary_search(std::vector<double> out_degrees, int left, int right, d
     return double_binary_search(out_degrees, mid, right, target);
 }
 
-double get_variance(std::vector<int> times, double average){
+double get_variance(std::vector<unsigned int> times, double average){
     int sum = 0;
     for(int tim: times){
         sum += pow(tim-average, 2);
