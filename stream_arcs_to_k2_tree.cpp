@@ -68,7 +68,7 @@ int main(int argc, char** argv){
     std::cout << "Graph compressed in " << compression_time << " ms" << std::endl;
 
     outfile.close();
-    double bpe = 8*written/arcs;
+    double bpe = 8*written/((double)arcs);
     std::setprecision(3);
     properties_out << "bitsperlink=" << bpe << std::endl;
     properties_out << "compression_time=" << compression_time << " ms" << std::endl;
@@ -121,8 +121,7 @@ int main(int argc, char** argv){
     }
 
     properties_out.close();
-    std::cout << std::endl << "Written " << written << " bytes: " << 8*written << " bits - " << std::endl;
-    std::cout << '\t' << bpe << " bpe"<< std::endl;
+    std::cout << std::endl << "Written " << written << " bytes: " << 8*written << " bits - " << bpe << " bpe"<< std::endl;
     std::cout << "compression time: " << compression_time << " ms - sequential scan time: " << sequential_scan_time << " ns/link" << std::endl;
     time_t t = time(0);
     std::cout << "Finished at " << ctime(&t) << std::endl;
