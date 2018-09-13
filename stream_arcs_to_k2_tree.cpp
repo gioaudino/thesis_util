@@ -113,7 +113,7 @@ int main(int argc, char** argv){
         });
         double avg = sum/count;
         double variance = get_variance(times, avg);
-        std::cout << "Random scan @ " << count << endl;
+        std::cout << "Random scan @ " << count << std::endl;
         std::cout << "avg: " << avg << " ns" << " - variance: " << variance << " - std dev: " << sqrt(variance) << std::endl;
         properties_out << "random_" << count << "_avg=" << avg << " ns" << std::endl;
         properties_out << "random_" << count << "_variance=" << variance << std::endl;
@@ -169,7 +169,7 @@ std::vector<double> create_out_degree_array(sdsl::k2_tree<2> tree, unsigned int 
     std::vector<double> out_degrees(nodes, 0);
     int index, sum = 0;
     for(index = 0; index < nodes; index++){
-        sum += tree.neigh(index).size()
+        sum += tree.neigh(index).size();
         out_degrees[index] = sum/arcs;
     }
     return out_degrees;
