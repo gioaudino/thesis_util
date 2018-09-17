@@ -134,6 +134,7 @@ int main(int argc, char** argv){
 
     std::vector<int> test(out_degrees.size(), 0);
     for(int t = 0; t < 1000000; t++){
+        if(t % 1000 == 0) std::cout << "..." <<std::endl;
         int selected_node = get_proportionally_random_node(out_degrees);
         test[selected_node]++;
     }
@@ -148,7 +149,7 @@ int main(int argc, char** argv){
     std::cout << "Result: ";
 
     for (int t = 0; t < out_degrees.size(); t++){
-        std::cout << (double) test[t]/1000000;
+        std::cout << (double) test[t]/1000000; << "\t";
     }
     std::cout << std::endl;
 
