@@ -133,9 +133,9 @@ int main(int argc, char** argv){
     std::vector<double> out_degrees = create_out_degree_array(k2, nodes, arcs);
 
     std::vector<int> test(out_degrees.size(), 0);
-    for(int t = 0; t < 1000000; t++){
+    for(int t = 0; t < 10; t++){
         int selected_node = get_proportionally_random_node(out_degrees);
-        std::cout << "Attempt # " << t << ":\t" < selected_node << std::endl;
+        std::cout << "Attempt # " << t << ":\t" << selected_node << std::endl;
         test[selected_node]++;
     }
 
@@ -210,6 +210,7 @@ std::vector<double> create_out_degree_array(const sdsl::k2_tree<2> &tree, unsign
 int get_proportionally_random_node(std::vector<double> out_degrees){
     srand(time(NULL));
     double target = rand()/RAND_MAX;
+    std::cout << "TARGET: " << target << std::endl;
     return double_binary_search(out_degrees, 0, out_degrees.size(), target);
 }
 
