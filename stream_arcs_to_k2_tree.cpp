@@ -132,15 +132,25 @@ int main(int argc, char** argv){
 
     std::vector<double> out_degrees = create_out_degree_array(k2, nodes, arcs);
 
+    std::vector<int> test(out_degrees.size(), 0);
+    for(int t = 0; t < 1000000; t++){
+        int selected_node = get_proportionally_random_node(out_degrees);
+        test[selected_node]++;
+    }
 
-    std::cout << "OUT DEGREES" << std::endl;
-
-    for(double deg: out_degrees){
-        std::cout << deg << '\t';
+    std::cout << "TEST binary search" << std::endl;
+    std::cout << "Distribution: ";
+    for(double d: out_degrees){
+        std::cout << d << "\t";
     }
     std::cout << std::endl;
 
+    std::cout << "Result: ";
 
+    for (int t = 0; t < out_degrees.size(); t++){
+        std::cout << (double) test[t]/1000000;
+    }
+    std::cout << std::endl;
 
     properties_out.close();
     std::cout << std::endl << "Written " << written << " bytes: " << 8*written << " bits - " << bpe << " bpe"<< std::endl;
@@ -203,9 +213,9 @@ int get_proportionally_random_node(std::vector<double> out_degrees){
 }
 
 int double_binary_search(std::vector<double> out_degrees, int left, int right, double target){
-    int mid = (right-left)/2;
-    if (out_degrees[mid] == target) return mid;
-    if (out_degrees[mid] < target && out_degrees[mid+1] > target) return mid+1;
+    if (right == left) return right;
+    int mid = left + (right-left)/2;
+    if(out_degrees[mid] == target || out_degrees[mid] > target && out_degrees[mid-1] < target) return mid;
     if (target < out_degrees[mid]) return double_binary_search(out_degrees, left, mid, target);
     return double_binary_search(out_degrees, mid, right, target);
 }
