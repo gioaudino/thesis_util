@@ -11,7 +11,7 @@
 std::vector<std::string> split(const std::string &s, char delim);
 std::pair<unsigned int,unsigned long> get_nodes_arcs(const std::string basename);
 long double get_cpu_time(std::clock_t time_start, std::clock_t time_end, unsigned int precision = 3);
-std::vector<double> create_out_degree_array(sdsl::k2_tree<2> tree, unsigned int nodes, unsigned long arcs);
+std::vector<double> create_out_degree_array(const sdsl::k2_tree<2> tree, unsigned int nodes, unsigned long arcs);
 int get_proportionally_random_node(std::vector<double> out_degrees);
 int double_binary_search(std::vector<double> out_degrees, int left, int right, double target);
 double get_variance(std::vector<unsigned int> times, double average);
@@ -130,7 +130,7 @@ int main(int argc, char** argv){
 
     std::cout << "Analyzing list scan with proportionally selected random nodes" << std::endl;
 
-    std::vector<double> out_degrees = create_out_degree_array(k2, nodes, arcs);
+    std::vector<double> out_degrees = create_out_degree_array(&k2, nodes, arcs);
 
 
     std::cout << "OUT DEGREES" << std::endl;
@@ -186,11 +186,11 @@ std::vector<std::string> split(const std::string &s, char delim) {
     return elems;
 }
 
-std::vector<double> create_out_degree_array(const sdsl::k2_tree<2> tree, unsigned int nodes, unsigned long arcs){
+std::vector<double> create_out_degree_array(const sdsl::k2_tree<2> &tree, unsigned int nodes, unsigned long arcs){
     std::vector<double> out_degrees(nodes, 0);
     int index, sum = 0;
     for(index = 0; index < nodes; index++){
-        sum += tree.neigh(index).size();
+        sum += *tree.neigh(index).size();
         out_degrees[index] = (double) sum/arcs;
     }
     return out_degrees;
