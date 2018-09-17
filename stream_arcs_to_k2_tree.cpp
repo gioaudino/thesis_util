@@ -186,12 +186,12 @@ std::vector<std::string> split(const std::string &s, char delim) {
     return elems;
 }
 
-std::vector<double> create_out_degree_array(sdsl::k2_tree<2> tree, unsigned int nodes, unsigned long arcs){
+std::vector<double> create_out_degree_array(const sdsl::k2_tree<2> tree, unsigned int nodes, unsigned long arcs){
     std::vector<double> out_degrees(nodes, 0);
     int index, sum = 0;
     for(index = 0; index < nodes; index++){
         sum += tree.neigh(index).size();
-        out_degrees[index] = sum/arcs;
+        out_degrees[index] = (double) sum/arcs;
     }
     return out_degrees;
 }
