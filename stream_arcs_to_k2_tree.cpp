@@ -60,8 +60,10 @@ int main(int argc, char** argv){
     k2 = sdsl::k2_tree<2>(arc_vector, nodes);
 
     auto written = k2.serialize(outfile);
+
     // END OF COMPRESSION TIME MEASURE
     std::clock_t time_end = std::clock();
+
     long double compression_time = get_cpu_time(time_start, time_end);
 
 
@@ -77,6 +79,8 @@ int main(int argc, char** argv){
 
     std::cout << "Analyzing sequential scan" << std::endl;
 
+    // START - SEQUENTIAL SCAN
+
     time_start = std::clock();
     for(index = 0; index < nodes; index++){
         for(long unsigned int node: k2.neigh(index)){
@@ -84,6 +88,10 @@ int main(int argc, char** argv){
         }
     }
     time_end = std::clock();
+
+    // END - SEQUENTIAL SCAN
+
+
     long double sequential_scan_time = get_cpu_time(time_start, time_end, 6)/arcs;
 
     std::cout << "Sequential scan completed: " << sequential_scan_time << " ns per link" << std::endl;
@@ -119,6 +127,15 @@ int main(int argc, char** argv){
         properties_out << "random_" << count << "_variance=" << variance << std::endl;
         properties_out << "random_" << count << "_stddev=" << sqrt(variance) << std::endl;
     }
+
+    std::cout << "Analyzing list scan with proportionally selected random nodes" << std::endl;
+
+    std::vector<double> out_degrees = create_out_degree_array(k2, nodes, arcs);
+
+
+    std::cout << "OUT DEGREES" << std::endl << out_degrees << std::endl;
+
+
 
     properties_out.close();
     std::cout << std::endl << "Written " << written << " bytes: " << 8*written << " bits - " << bpe << " bpe"<< std::endl;
