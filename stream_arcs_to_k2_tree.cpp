@@ -209,7 +209,7 @@ std::vector<double> create_out_degree_array(const sdsl::k2_tree<2> &tree, unsign
 
 int get_proportionally_random_node(std::vector<double> out_degrees){
     srand(time(NULL));
-    double target = rand()/RAND_MAX;
+    double target = (double) rand()/RAND_MAX;
     std::cout << "TARGET: " << target << std::endl;
     return double_binary_search(out_degrees, 0, out_degrees.size(), target);
 }
