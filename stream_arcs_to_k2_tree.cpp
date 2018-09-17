@@ -133,7 +133,12 @@ int main(int argc, char** argv){
     std::vector<double> out_degrees = create_out_degree_array(k2, nodes, arcs);
 
 
-    std::cout << "OUT DEGREES" << std::endl << out_degrees << std::endl;
+    std::cout << "OUT DEGREES" << std::endl;
+
+    for(double deg: out_degrees){
+        std::cout << deg << '\t';
+    }
+    std::cout << std::endl;
 
 
 
