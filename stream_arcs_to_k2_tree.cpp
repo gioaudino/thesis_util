@@ -15,6 +15,7 @@ std::vector<double> create_out_degree_array(const sdsl::k2_tree<2> &tree, unsign
 int get_proportionally_random_node(std::vector<double> out_degrees);
 int double_binary_search(std::vector<double> out_degrees, int left, int right, double target);
 double get_variance(std::vector<unsigned int> times, double average);
+std::vector<int> get_proportionally_random_nodes(std::vector<double> out_degrees, int count);
 
 const std::vector<int> counts = {10,100,1000,10000};
 int main(int argc, char** argv){
