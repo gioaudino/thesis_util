@@ -133,10 +133,10 @@ int main(int argc, char** argv){
     std::vector<double> out_degrees = create_out_degree_array(k2, nodes, arcs);
 
     std::vector<int> test(out_degrees.size(), 0);
-    for(int t = 0; t < 10; t++){
-        int selected_node = get_proportionally_random_node(out_degrees);
-        std::cout << "Attempt # " << t << ":\t" << selected_node << std::endl;
-        test[selected_node]++;
+    std::vector<int> randoms = get_proportionally_random_nodes(out_degrees, 10);
+
+    for(int i: randoms){
+        test[i]++;
     }
 
     std::cout << "TEST binary search" << std::endl;
@@ -149,7 +149,7 @@ int main(int argc, char** argv){
     std::cout << "Result: ";
 
     for (int t = 0; t < out_degrees.size(); t++){
-        std::cout << (double) test[t]/1000000 << "\t";
+        std::cout << (double) test[t]/10 << "\t";
     }
     std::cout << std::endl;
 
@@ -212,6 +212,17 @@ int get_proportionally_random_node(std::vector<double> out_degrees){
     double target = (double) rand()/RAND_MAX;
     std::cout << "TARGET: " << target << std::endl;
     return double_binary_search(out_degrees, 0, out_degrees.size(), target);
+}
+
+std::vector<int> get_proportionally_random_nodes(std::vector<double> out_degrees, int count){
+    srand(time(NULL));
+    std::vector<int> nodes(count, 0);
+    double target;
+    for(int i = 0; i < count; i++){
+        target = (double) rand()/RAND_MAX;
+        nodes[i] = double_binary_search(out_degrees, 0, out_degrees.size(), target);
+    }
+    return nodes;
 }
 
 int double_binary_search(std::vector<double> out_degrees, int left, int right, double target){
