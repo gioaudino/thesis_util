@@ -78,7 +78,7 @@ int main(int argc, char** argv){
 
     long unsigned int keep = 0;
 
-    std::cout << "Analyzing sequential scan" << std::endl;
+    std::cout << std::endl << "Analyzing sequential scan" << std::endl;
 
     // START - SEQUENTIAL SCAN
 
@@ -95,7 +95,7 @@ int main(int argc, char** argv){
 
     long double sequential_scan_time = get_cpu_time(time_start, time_end, 6)/arcs;
 
-    std::cout << "Sequential scan completed: " << sequential_scan_time << " ns per link" << std::endl;
+    std::cout << "Sequential scan completed: " << sequential_scan_time << " ns per link" << std::endl << std::endl;
     properties_out << "sequential_scan_time=" << sequential_scan_time << " ns/link" << std::endl;
 
 
@@ -129,7 +129,7 @@ int main(int argc, char** argv){
         properties_out << "random_" << count << "_stddev=" << sqrt(variance) << std::endl;
     }
 
-    std::cout << "Analyzing list scan with proportionally selected random nodes" << std::endl;
+    std::cout << std::endl << "Analyzing list scan with proportionally selected random nodes" << std::endl;
 
     std::vector<double> out_degrees = create_out_degree_array(k2, nodes, arcs);
 
