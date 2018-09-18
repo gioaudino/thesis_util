@@ -133,26 +133,29 @@ int main(int argc, char** argv){
 
     std::vector<double> out_degrees = create_out_degree_array(k2, nodes, arcs);
 
-    std::vector<int> test(out_degrees.size(), 0);
-    std::vector<int> randoms = get_proportionally_random_nodes(out_degrees, 10);
-
-    for(int i: randoms){
-        test[i]++;
+    for(int count: counts){
+        std::vector<unsigned int> times(count,0);
+        std::vector<int> random_nodes = get_proportionally_random_nodes(out_degrees, count);
+        for(int c = 0; c < count; c++){
+            time_start = std::clock();
+            for(long unsigned int n: k2.neigh(random_nodes[c])){
+                keep ^= n;
+            }
+            time_end = std::clock();
+            times[c] = get_cpu_time(time_start, time_end, 6);
+        }
+        int sum = 0;
+        std::for_each(times.begin(), times.end(), [&] (int val) {
+            sum +=val;
+        });
+        double avg = sum/count;
+        double variance = get_variance(times, avg);
+        std::cout << "Proportionally random scan @ " << count << std::endl;
+        std::cout << "avg: " << avg << " ns" << " - variance: " << variance << " - std dev: " << sqrt(variance) << std::endl;
+        properties_out << "proportionally_random_" << count << "_avg=" << avg << " ns" << std::endl;
+        properties_out << "proportionally_random_" << count << "_variance=" << variance << std::endl;
+        properties_out << "proportionally_random_" << count << "_stddev=" << sqrt(variance) << std::endl;
     }
-
-    std::cout << "TEST binary search" << std::endl;
-    std::cout << "Distribution: ";
-    for(double d: out_degrees){
-        std::cout << d << "\t";
-    }
-    std::cout << std::endl;
-
-    std::cout << "Result: ";
-
-    for (int t = 0; t < out_degrees.size(); t++){
-        std::cout << (double) test[t]/10 << "\t";
-    }
-    std::cout << std::endl;
 
     properties_out.close();
     std::cout << std::endl << "Written " << written << " bytes: " << 8*written << " bits - " << bpe << " bpe"<< std::endl;
@@ -206,13 +209,6 @@ std::vector<double> create_out_degree_array(const sdsl::k2_tree<2> &tree, unsign
         out_degrees[index] = (double) sum/arcs;
     }
     return out_degrees;
-}
-
-int get_proportionally_random_node(std::vector<double> out_degrees){
-    srand(time(NULL));
-    double target = (double) rand()/RAND_MAX;
-    std::cout << "TARGET: " << target << std::endl;
-    return double_binary_search(out_degrees, 0, out_degrees.size(), target);
 }
 
 std::vector<int> get_proportionally_random_nodes(std::vector<double> out_degrees, int count){
