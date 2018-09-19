@@ -7,6 +7,7 @@
 #include <math.h>
 #include <cstdlib>
 #include <random>
+#include <ef/elias_fano.h>
 
 std::pair<unsigned int, unsigned int> get_min_max(const std::vector<unsigned int> times);
 std::vector<std::string> split(const std::string &s, char delim);
@@ -17,6 +18,10 @@ int get_proportionally_random_node(std::vector<double> out_degrees);
 int double_binary_search(std::vector<double> out_degrees, int left, int right, double target);
 double get_variance(std::vector<unsigned int> times, double average);
 std::vector<int> get_proportionally_random_nodes(std::vector<double> out_degrees, int count);
+
+std::vector<uint64_t> build_prefixed_out_degree_array(const sdsl::k2_tree<2> &tree, unsigned int nodes);
+elias_fano build_ef_from_k2tree(const sdsl::k2_tree<2> &tree, unsigned int nodes);
+elias_fano get_ef_from_out_degree_array(std::vector<uint64_t> sum_out_degrees);
 
 const std::vector<int> counts = {10,100,1000,10000};
 int main(int argc, char** argv){
@@ -148,11 +153,13 @@ int main(int argc, char** argv){
 
     std::cout << std::endl << "Analyzing list scan with proportionally selected random nodes" << std::endl;
 
-    std::vector<double> out_degrees = create_out_degree_array(k2, nodes, arcs);
+    // std::vector<double> out_degrees = create_out_degree_array(k2, nodes, arcs);
+
+    elias_fano ef = build_ef_from_k2tree(k2, nodes);
 
     for(int count: counts){
         std::vector<unsigned int> times(count,0);
-        std::vector<int> random_nodes = get_proportionally_random_nodes(out_degrees, count);
+        std::vector<int> random_nodes = get_proportionally_random_node_list(ef, nodes, count);
         int prevent = 0;
         for(int c = 0; c < count; c++){
             time_start = std::clock();
@@ -250,6 +257,36 @@ std::vector<double> create_out_degree_array(const sdsl::k2_tree<2> &tree, unsign
         out_degrees[index] = (double) sum/arcs;
     }
     return out_degrees;
+}
+
+std::vector<uint64_t> build_prefixed_out_degree_array(const sdsl::k2_tree<2> &tree, unsigned int nodes){
+    std::vector<uint64_t> out_degrees(nodes, 0);
+    out_degrees[0] = tree.neigh(0).size();
+    int index, sum = 0;
+    for(index = 1; index < nodes; index++){
+        out_degrees[index] = out_degrees[index-1] + tree.neigh(index).size();
+    }
+    return out_degrees;
+}
+
+elias_fano get_ef_from_out_degree_array(std::vector<uint64_t> sum_out_degrees){
+    return elias_fano(sum_out_degrees, sum_out_degrees[sum_out_degrees.size()-1]+1);
+}
+
+elias_fano build_ef_from_k2tree(const sdsl::k2_tree<2> &tree, unsigned int nodes){
+    return get_ef_from_out_degree_array(build_prefixed_out_degree_array(tree, nodes));
+}
+
+std::vector<int> get_proportionally_random_node_list(elias_fano ef, unsigned int nodes, int count){
+    std::random_device seed;
+    std::mt19937 gen(seed());
+    std::uniform_int_distribution<int> dist(0, nodes);
+
+    std::vector<int> random_nodes(count, 0);
+    for(int i=0; i < count; i++){
+        random_nodes[i] = ef.rank(dist(gen));
+    }
+    return random_nodes;
 }
 
 std::vector<int> get_proportionally_random_nodes(std::vector<double> out_degrees, int count){
