@@ -113,23 +113,21 @@ int main(int argc, char** argv){
     std::uniform_int_distribution<int> dist(0, nodes);
 
     for(int count: counts){
+        std::clock_t time_0, time_1;
         std::vector<unsigned int> times(count,0);
         int prevent = 0;
         for(int c = 0; c < count; c++){
             unsigned int node = dist(gen);
-            time_start = std::clock();
+            time_0 = std::clock();
             for(long unsigned int n: k2.neigh(node)){
                 prevent ^= n;
             }
-            time_end = std::clock();
-            times[c] = get_cpu_time(time_start, time_end, 6);
+            time_1 = std::clock();
+            times[c] = get_cpu_time(time_0, time_1, 6);
         }
         const volatile int unused = prevent;
-        int sum = 0;
-        for(int t: times){
-            sum += t;
-        }
-        double avg = (double) sum/count;
+
+        double avg = get_mean(times);
         double variance = get_variance(times, avg);
         auto min_max = get_min_max(times);
         std::cout << "Random scan @ " << count << std::endl;
@@ -156,24 +154,22 @@ int main(int argc, char** argv){
     elias_fano ef = build_ef_from_k2tree(k2, nodes);
 
     for(int count: counts){
+        std::clock_t time_0, time_1;
         std::vector<unsigned int> times(count,0);
         std::vector<int> random_nodes = get_proportionally_random_nodes(ef, arcs, count);
         int prevent = 0;
         for(int c = 0; c < count; c++){
-            time_start = std::clock();
+            time_0 = std::clock();
             for(long unsigned int n: k2.neigh(random_nodes[c])){
                 keep ^= n;
             }
-            time_end = std::clock();
-            times[c] = get_cpu_time(time_start, time_end, 6);
+            time_1 = std::clock();
+            times[c] = get_cpu_time(time_0, time_1, 6);
         }
         const volatile int unused = prevent;
-        int sum = 0;
-        for(int t: times){
-            sum += t;
-        }
+
         auto min_max = get_min_max(times);
-        double avg = (double) sum/count;
+        double avg = get_mean(times);
         double variance = get_variance(times, avg);
         std::cout << "Proportionally random scan @ " << count << std::endl;
         std::cout << "avg: " << avg << " ns" << " - min " << min_max.first << " ns - max " << min_max.second << " ns - variance: " << variance << " - std dev: " << sqrt(variance) << std::endl;
@@ -191,6 +187,39 @@ int main(int argc, char** argv){
         // }
         // os.close();
     }
+
+    std::cout << std::endl << "Testing node adjacency" << std::endl;
+
+    std::random_device random_seed;
+    std::mt19937 random_generator(random_seed());
+    std::uniform_int_distribution<int> distribution(0, nodes);
+
+    for(int count: counts){
+        std::vector<unsigned int> times(count,0);
+        bool acc = false;
+        std::clock_t time_0, time_1;
+        for(int i=0; i<count; i++){
+            int j = distribution(random_generator), k = distribution(random_generator);
+            time_0 = std::clock();
+            acc &= k2.adj(j, k);
+            time_1 = std::clock();
+            times[i] = get_cpu_time(time_0, time_1, 6);
+        }
+        const volatile bool r = acc;
+
+        auto min_max = get_min_max(times);
+        double avg = get_mean(times);
+        double variance = get_variance(times, avg);
+        std::cout << "Adjacency @ " << count << std::endl;
+        std::cout << "avg: " << avg << " ns" << " - min " << min_max.first << " ns - max " << min_max.second << " ns - variance: " << variance << " - std dev: " << sqrt(variance) << std::endl;
+        properties_out << "adjacency_" << count << "_avg=" << avg << " ns" << std::endl;
+        properties_out << "adjacency_" << count << "_min=" << min_max.first << " ns" << std::endl;
+        properties_out << "adjacency_" << count << "_max=" << min_max.second << " ns" << std::endl;
+        properties_out << "adjacency_" << count << "_variance=" << variance << std::endl;
+        properties_out << "adjacency_" << count << "_stddev=" << sqrt(variance) << std::endl;
+
+    }
+
 
     properties_out.close();
     std::cout << std::endl << "Written " << written << " bytes: " << 8*written << " bits - " << bpe << " bpe"<< std::endl;
@@ -283,4 +312,12 @@ double get_variance(std::vector<unsigned int> times, double average){
         sum += pow(tim-average, 2);
     }
     return sum/(times.size()-1);
+}
+
+double get_mean(std::vector<unsigned int> times){
+    int sum = 0;
+    for(int t: times){
+        sum += t;
+    }
+    return (double) sum / (double) times.size();
 }
