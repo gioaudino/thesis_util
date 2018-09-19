@@ -141,7 +141,7 @@ int main(int argc, char** argv){
         for(int t: times){
             os << t < std::endl;
         }
-        of.close();
+        os.close();
     }
 
     std::cout << std::endl << "Analyzing list scan with proportionally selected random nodes" << std::endl;
@@ -181,7 +181,7 @@ int main(int argc, char** argv){
         for(int t: times){
             os << t < std::endl;
         }
-        of.close();
+        os.close();
 
     }
 
