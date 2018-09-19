@@ -8,7 +8,7 @@
 #include <cstdlib>
 #include <random>
 
-std::pair<unsigned int, unsigned int> get_min_max(const std::vector<int> times);
+std::pair<unsigned int, unsigned int> get_min_max(const std::vector<unsigned int> times);
 std::vector<std::string> split(const std::string &s, char delim);
 std::pair<unsigned int,unsigned long> get_nodes_arcs(const std::string basename);
 long double get_cpu_time(std::clock_t time_start, std::clock_t time_end, unsigned int precision = 3);
@@ -204,7 +204,7 @@ std::pair<unsigned int,unsigned long> get_nodes_arcs(const std::string basename)
     return std::make_pair(nodes, arcs);
 }
 
-std::pair<unsigned int, unsigned int> get_min_max(const std::vector<int> times){
+std::pair<unsigned int, unsigned int> get_min_max(const std::vector<unsigned int> times){
     if(times.empty())
         return NULL;
     int min = times[0], max = times[0];
