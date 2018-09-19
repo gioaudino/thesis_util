@@ -15,7 +15,7 @@ std::pair<unsigned int,unsigned long> get_nodes_arcs(const std::string basename)
 long double get_cpu_time(std::clock_t time_start, std::clock_t time_end, unsigned int precision = 3);
 std::vector<double> create_out_degree_array(const sdsl::k2_tree<2> &tree, unsigned int nodes, unsigned long arcs);
 double get_variance(std::vector<unsigned int> times, double average);
-std::vector<int> get_proportionally_random_node_list(elias_fano ef, unsigned int nodes, int count);
+std::vector<int> get_proportionally_random_nodes(elias_fano ef, unsigned long nodes, int count);
 
 std::vector<uint64_t> build_prefixed_out_degree_array(const sdsl::k2_tree<2> &tree, unsigned int nodes);
 elias_fano build_ef_from_k2tree(const sdsl::k2_tree<2> &tree, unsigned int nodes);
@@ -157,7 +157,7 @@ int main(int argc, char** argv){
 
     for(int count: counts){
         std::vector<unsigned int> times(count,0);
-        std::vector<int> random_nodes = get_proportionally_random_node_list(ef, nodes, count);
+        std::vector<int> random_nodes = get_proportionally_random_nodes(ef, arcs, count);
         int prevent = 0;
         for(int c = 0; c < count; c++){
             time_start = std::clock();
@@ -265,10 +265,10 @@ elias_fano build_ef_from_k2tree(const sdsl::k2_tree<2> &tree, unsigned int nodes
     return get_ef_from_out_degree_array(build_prefixed_out_degree_array(tree, nodes));
 }
 
-std::vector<int> get_proportionally_random_node_list(elias_fano ef, unsigned int nodes, int count){
+std::vector<int> get_proportionally_random_nodes(elias_fano ef, unsigned long arcs, int count){
     std::random_device seed;
     std::mt19937 gen(seed());
-    std::uniform_int_distribution<int> dist(0, nodes);
+    std::uniform_int_distribution<int> dist(0, arcs);
 
     std::vector<int> random_nodes(count, 0);
     for(int i=0; i < count; i++){
