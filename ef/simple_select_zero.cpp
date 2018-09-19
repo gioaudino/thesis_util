@@ -1,7 +1,7 @@
-/*		 
+/*
  * Sux: Succinct data structures
  *
- * Copyright (C) 2007-2013 Sebastiano Vigna 
+ * Copyright (C) 2007-2013 Sebastiano Vigna
  *
  *  This library is free software; you can redistribute it and/or modify it
  *  under the terms of the GNU Lesser General Public License as published by the Free
@@ -27,7 +27,6 @@ using namespace std;
 #include <algorithm>
 #include "select.h"
 #include "simple_select_zero.h"
-#include "rank9.h"
 
 #define MAX_ONES_PER_INVENTORY (8192)
 
@@ -36,7 +35,7 @@ simple_select_zero::simple_select_zero() {}
 simple_select_zero::simple_select_zero( const uint64_t * const bits, const uint64_t num_bits, const int max_log2_longwords_per_subinventory ) {
 	this->bits = bits;
 	num_words = ( num_bits + 63 ) / 64;
-	
+
 	// Init rank/select structure
 	uint64_t c = 0;
 	for( uint64_t i = 0; i < num_words; i++ ) c += __builtin_popcountll( ~bits[ i ] );
@@ -52,7 +51,7 @@ if ( num_bits % 64 != 0 ) c -= 64 - num_bits % 64;
 	ones_per_inventory_mask = ones_per_inventory - 1;
 	inventory_size = ( c + ones_per_inventory - 1 ) / ones_per_inventory;
 
-	printf("Number of ones: %lld Number of ones per inventory item: %d\n", c, ones_per_inventory );	
+	printf("Number of ones: %lld Number of ones per inventory item: %d\n", c, ones_per_inventory );
 
 	log2_longwords_per_subinventory = min( max_log2_longwords_per_subinventory, max( 0, log2_ones_per_inventory - 2 ) );
 	longwords_per_subinventory = 1 << log2_longwords_per_subinventory;
@@ -101,7 +100,7 @@ if ( num_bits % 64 != 0 ) c -= 64 - num_bits % 64;
 						start = inventory[ inventory_index * longwords_per_inventory ];
 						span = inventory[ ( inventory_index + 1 ) * longwords_per_inventory ] - start;
 						ones = min( c - d, (uint64_t)ones_per_inventory );
-						
+
 						assert( start + span == num_bits || ones == ones_per_inventory );
 
 						// We accumulate space for exact pointers ONLY if necessary.
@@ -259,7 +258,7 @@ uint64_t simple_select_zero::select_zero( const uint64_t rank ) {
 		if ( residual < bit_count ) break;
 		word = ~bits[ ++word_index ];
 		residual -= bit_count;
-	} 
+	}
 
 	return word_index * 64 + select_in_word( word, residual );
 }
