@@ -76,12 +76,13 @@ int main(int argc, char** argv){
     properties_out << "bitsperlink=" << bpe << std::endl;
     properties_out << "compression_time=" << compression_time << " ms" << std::endl;
 
-    long unsigned int keep = 0;
+
 
     std::cout << std::endl << "Analyzing sequential scan" << std::endl;
 
     // START - SEQUENTIAL SCAN
 
+    int keep = 0;
     time_start = std::clock();
     for(index = 0; index < nodes; index++){
         for(long unsigned int node: k2.neigh(index)){
@@ -89,7 +90,7 @@ int main(int argc, char** argv){
         }
     }
     time_end = std::clock();
-
+    const volatile int ignored = keep;
     // END - SEQUENTIAL SCAN
 
 
@@ -107,24 +108,29 @@ int main(int argc, char** argv){
 
     for(int count: counts){
         std::vector<unsigned int> times(count,0);
+        int prevent = 0;
         for(int c = 0; c < count; c++){
             unsigned int node = dist(gen);
             time_start = std::clock();
             for(long unsigned int n: k2.neigh(node)){
-                keep ^= n;
+                prevent ^= n;
             }
             time_end = std::clock();
             times[c] = get_cpu_time(time_start, time_end, 6);
         }
+        const volatile unused = prevent;
         int sum = 0;
-        std::for_each(times.begin(), times.end(), [&] (int val) {
-            sum +=val;
-        });
-        double avg = sum/count;
+        for(int t: times){
+            sum += t;
+        }
+        double avg = (double) sum/count;
         double variance = get_variance(times, avg);
+        int max = std::max_element(times.begin(), times.end()), min = std::min_element(times.begin(), times.end());
         std::cout << "Random scan @ " << count << std::endl;
-        std::cout << "avg: " << avg << " ns" << " - variance: " << variance << " - std dev: " << sqrt(variance) << std::endl;
+        std::cout << "avg: " << avg << " ns" << " - max " << max << " ns - min " << min << " ns - variance: " << variance << " - std dev: " << sqrt(variance) << std::endl;
         properties_out << "random_" << count << "_avg=" << avg << " ns" << std::endl;
+        properties_out << "random_" << count << "_max=" << max << " ns" << std::endl;
+        properties_out << "random_" << count << "_min=" << min << " ns" << std::endl;
         properties_out << "random_" << count << "_variance=" << variance << std::endl;
         properties_out << "random_" << count << "_stddev=" << sqrt(variance) << std::endl;
     }
@@ -136,6 +142,7 @@ int main(int argc, char** argv){
     for(int count: counts){
         std::vector<unsigned int> times(count,0);
         std::vector<int> random_nodes = get_proportionally_random_nodes(out_degrees, count);
+        int prevent = 0
         for(int c = 0; c < count; c++){
             time_start = std::clock();
             for(long unsigned int n: k2.neigh(random_nodes[c])){
@@ -144,15 +151,18 @@ int main(int argc, char** argv){
             time_end = std::clock();
             times[c] = get_cpu_time(time_start, time_end, 6);
         }
+        const volatile unused = prevent;
         int sum = 0;
-        std::for_each(times.begin(), times.end(), [&] (int val) {
-            sum +=val;
-        });
-        double avg = sum/count;
+        for(int t: times){
+            sum += t;
+        }
+        double avg = (double) sum/count;
         double variance = get_variance(times, avg);
         std::cout << "Proportionally random scan @ " << count << std::endl;
         std::cout << "avg: " << avg << " ns" << " - variance: " << variance << " - std dev: " << sqrt(variance) << std::endl;
         properties_out << "proportionally_random_" << count << "_avg=" << avg << " ns" << std::endl;
+        properties_out << "proportionally_random_" << count << "_max=" << std::max_element(times.begin(), times.end()) << " ns" << std::endl;
+        properties_out << "proportionally_random_" << count << "_min=" << std::min_element(times.begin(), times.end()) << " ns" << std::endl;
         properties_out << "proportionally_random_" << count << "_variance=" << variance << std::endl;
         properties_out << "proportionally_random_" << count << "_stddev=" << sqrt(variance) << std::endl;
     }
