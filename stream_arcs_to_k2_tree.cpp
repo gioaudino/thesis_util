@@ -96,9 +96,11 @@ int main(int argc, char** argv){
 
 
     long double sequential_scan_time = get_cpu_time(time_start, time_end, 6)/arcs;
+    long double edges_per_second = (double) arcs / get_cpu_time(time_start, time_end, 1);
 
-    std::cout << "Sequential scan completed: " << sequential_scan_time << " ns per link" << std::endl << std::endl;
-    properties_out << "sequential_scan_time=" << sequential_scan_time << " ns/link" << std::endl;
+    std::cout << "Sequential scan completed: " << sequential_scan_time << " ns per link - " << edges_per_second << " links per s" << std::endl << std::endl;
+    properties_out << "sequential_scan_time_nspl=" << sequential_scan_time << " ns/link" << std::endl;
+    properties_out << "sequential_scan_time_lps=" << edges_per_second << " link/s" << std::endl;
 
 
     std::cout << "Analyzing list scan with randomly selected nodes" << std::endl;
@@ -135,13 +137,13 @@ int main(int argc, char** argv){
         properties_out << "random_" << count << "_variance=" << variance << std::endl;
         properties_out << "random_" << count << "_stddev=" << sqrt(variance) << std::endl;
 
-        std::string of(std::to_string(count));
-        of.append("random");
-        std::ofstream os(of);
-        for(int t: times){
-            os << t << std::endl;
-        }
-        os.close();
+        // std::string of(std::to_string(count));
+        // of.append("random");
+        // std::ofstream os(of);
+        // for(int t: times){
+        //     os << t << std::endl;
+        // }
+        // os.close();
     }
 
     std::cout << std::endl << "Analyzing list scan with proportionally selected random nodes" << std::endl;
@@ -175,14 +177,14 @@ int main(int argc, char** argv){
         properties_out << "proportionally_random_" << count << "_max=" << min_max.second << " ns" << std::endl;
         properties_out << "proportionally_random_" << count << "_variance=" << variance << std::endl;
         properties_out << "proportionally_random_" << count << "_stddev=" << sqrt(variance) << std::endl;
-        std::string of(std::to_string(count));
-        of.append("prop");
-        std::ofstream os(of);
-        for(int t: times){
-            os << t << std::endl;
-        }
-        os.close();
 
+        // std::string of(std::to_string(count));
+        // of.append("prop");
+        // std::ofstream os(of);
+        // for(int t: times){
+        //     os << t << std::endl;
+        // }
+        // os.close();
     }
 
     properties_out.close();
