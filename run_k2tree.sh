@@ -13,5 +13,6 @@ b++ stream_arcs_to_k2_tree.cpp
 compile=$?
 cd $goto
 if [[ compile -eq 0 ]]; then
+    clear;
     java it.unimi.dsi.webgraph.ArcListASCIIGraph $2 >($1/stream_arcs_to_k2_tree.out $3 $2);
 fi
