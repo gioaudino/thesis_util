@@ -8,6 +8,7 @@
 #include <cstdlib>
 #include <random>
 
+std::pair<unsigned int, unsigned int> get_min_max(const std::vector<int> times);
 std::vector<std::string> split(const std::string &s, char delim);
 std::pair<unsigned int,unsigned long> get_nodes_arcs(const std::string basename);
 long double get_cpu_time(std::clock_t time_start, std::clock_t time_end, unsigned int precision = 3);
@@ -125,12 +126,12 @@ int main(int argc, char** argv){
         }
         double avg = (double) sum/count;
         double variance = get_variance(times, avg);
-        int max = std::max_element(times.begin(), times.end()), min = std::min_element(times.begin(), times.end());
+        auto min_max = get_min_max(times);
         std::cout << "Random scan @ " << count << std::endl;
-        std::cout << "avg: " << avg << " ns" << " - max " << max << " ns - min " << min << " ns - variance: " << variance << " - std dev: " << sqrt(variance) << std::endl;
+        std::cout << "avg: " << avg << " ns" << " - min " << min_max.first << " ns - max " << min_max.second << " ns - variance: " << variance << " - std dev: " << sqrt(variance) << std::endl;
         properties_out << "random_" << count << "_avg=" << avg << " ns" << std::endl;
-        properties_out << "random_" << count << "_max=" << max << " ns" << std::endl;
-        properties_out << "random_" << count << "_min=" << min << " ns" << std::endl;
+        properties_out << "random_" << count << "_min=" << min_max.first << " ns" << std::endl;
+        properties_out << "random_" << count << "_max=" << min_max.second << " ns" << std::endl;
         properties_out << "random_" << count << "_variance=" << variance << std::endl;
         properties_out << "random_" << count << "_stddev=" << sqrt(variance) << std::endl;
     }
@@ -156,13 +157,14 @@ int main(int argc, char** argv){
         for(int t: times){
             sum += t;
         }
+        auto min_max = get_min_max(times);
         double avg = (double) sum/count;
         double variance = get_variance(times, avg);
         std::cout << "Proportionally random scan @ " << count << std::endl;
-        std::cout << "avg: " << avg << " ns" << " - variance: " << variance << " - std dev: " << sqrt(variance) << std::endl;
+        std::cout << "avg: " << avg << " ns" << " - min " << min_max.first << " ns - max " << min_max.second << " ns - variance: " << variance << " - std dev: " << sqrt(variance) << std::endl;
         properties_out << "proportionally_random_" << count << "_avg=" << avg << " ns" << std::endl;
-        properties_out << "proportionally_random_" << count << "_max=" << std::max_element(times.begin(), times.end()) << " ns" << std::endl;
-        properties_out << "proportionally_random_" << count << "_min=" << std::min_element(times.begin(), times.end()) << " ns" << std::endl;
+        properties_out << "proportionally_random_" << count << "_min=" << min_max.first << " ns" << std::endl;
+        properties_out << "proportionally_random_" << count << "_max=" << min_max.second << " ns" << std::endl;
         properties_out << "proportionally_random_" << count << "_variance=" << variance << std::endl;
         properties_out << "proportionally_random_" << count << "_stddev=" << sqrt(variance) << std::endl;
     }
@@ -200,6 +202,17 @@ std::pair<unsigned int,unsigned long> get_nodes_arcs(const std::string basename)
     }
     properties.close();
     return std::make_pair(nodes, arcs);
+}
+
+std::pair<unsigned int, unsigned int> get_min_max(const std::vector<int> times){
+    if(times.empty())
+        return NULL;
+    int min = times[0], max = times[0];
+    for(int t: times){
+        if(t < min) min = t;
+        if(t > max) max = t;
+    }
+    return std::make_pair(min, max);
 }
 std::vector<std::string> split(const std::string &s, char delim) {
     std::stringstream ss(s);
