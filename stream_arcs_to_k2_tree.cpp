@@ -139,7 +139,7 @@ int main(int argc, char** argv){
         of.append("random");
         std::ofstream os(of);
         for(int t: times){
-            os << t < std::endl;
+            os << t << std::endl;
         }
         os.close();
     }
@@ -179,7 +179,7 @@ int main(int argc, char** argv){
         of.append("prop");
         std::ofstream os(of);
         for(int t: times){
-            os << t < std::endl;
+            os << t << std::endl;
         }
         os.close();
 
