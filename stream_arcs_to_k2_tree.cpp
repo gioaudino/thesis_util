@@ -134,6 +134,14 @@ int main(int argc, char** argv){
         properties_out << "random_" << count << "_max=" << min_max.second << " ns" << std::endl;
         properties_out << "random_" << count << "_variance=" << variance << std::endl;
         properties_out << "random_" << count << "_stddev=" << sqrt(variance) << std::endl;
+
+        std::string of(count);
+        of.append("random");
+        std::ofstream os(of);
+        for(int t: times){
+            os << t < std::endl;
+        }
+        of.close();
     }
 
     std::cout << std::endl << "Analyzing list scan with proportionally selected random nodes" << std::endl;
@@ -167,6 +175,14 @@ int main(int argc, char** argv){
         properties_out << "proportionally_random_" << count << "_max=" << min_max.second << " ns" << std::endl;
         properties_out << "proportionally_random_" << count << "_variance=" << variance << std::endl;
         properties_out << "proportionally_random_" << count << "_stddev=" << sqrt(variance) << std::endl;
+        std::string of(count);
+        of.append("prop");
+        std::ofstream os(of);
+        for(int t: times){
+            os << t < std::endl;
+        }
+        of.close();
+
     }
 
     properties_out.close();
