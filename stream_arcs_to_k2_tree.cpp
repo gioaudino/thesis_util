@@ -14,10 +14,7 @@ std::vector<std::string> split(const std::string &s, char delim);
 std::pair<unsigned int,unsigned long> get_nodes_arcs(const std::string basename);
 long double get_cpu_time(std::clock_t time_start, std::clock_t time_end, unsigned int precision = 3);
 std::vector<double> create_out_degree_array(const sdsl::k2_tree<2> &tree, unsigned int nodes, unsigned long arcs);
-int get_proportionally_random_node(std::vector<double> out_degrees);
-int double_binary_search(std::vector<double> out_degrees, int left, int right, double target);
 double get_variance(std::vector<unsigned int> times, double average);
-std::vector<int> get_proportionally_random_nodes(std::vector<double> out_degrees, int count);
 std::vector<int> get_proportionally_random_node_list(elias_fano ef, unsigned int nodes, int count);
 
 std::vector<uint64_t> build_prefixed_out_degree_array(const sdsl::k2_tree<2> &tree, unsigned int nodes);
@@ -250,16 +247,6 @@ std::vector<std::string> split(const std::string &s, char delim) {
     return elems;
 }
 
-std::vector<double> create_out_degree_array(const sdsl::k2_tree<2> &tree, unsigned int nodes, unsigned long arcs){
-    std::vector<double> out_degrees(nodes, 0);
-    int index, sum = 0;
-    for(index = 0; index < nodes; index++){
-        sum += tree.neigh(index).size();
-        out_degrees[index] = (double) sum/arcs;
-    }
-    return out_degrees;
-}
-
 std::vector<uint64_t> build_prefixed_out_degree_array(const sdsl::k2_tree<2> &tree, unsigned int nodes){
     std::vector<uint64_t> out_degrees(nodes, 0);
     out_degrees[0] = tree.neigh(0).size();
@@ -288,25 +275,6 @@ std::vector<int> get_proportionally_random_node_list(elias_fano ef, unsigned int
         random_nodes[i] = ef.rank(dist(gen));
     }
     return random_nodes;
-}
-
-std::vector<int> get_proportionally_random_nodes(std::vector<double> out_degrees, int count){
-    srand(time(NULL));
-    std::vector<int> nodes(count, 0);
-    double target;
-    for(int i = 0; i < count; i++){
-        target = (double) rand()/RAND_MAX;
-        nodes[i] = double_binary_search(out_degrees, 0, out_degrees.size(), target);
-    }
-    return nodes;
-}
-
-int double_binary_search(std::vector<double> out_degrees, int left, int right, double target){
-    if (right == left) return right;
-    int mid = left + (right-left)/2;
-    if(out_degrees[mid] == target || out_degrees[mid] > target && out_degrees[mid-1] < target) return mid;
-    if (target < out_degrees[mid]) return double_binary_search(out_degrees, left, mid, target);
-    return double_binary_search(out_degrees, mid, right, target);
 }
 
 double get_variance(std::vector<unsigned int> times, double average){
