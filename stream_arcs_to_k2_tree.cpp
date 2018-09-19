@@ -7,7 +7,7 @@
 #include <math.h>
 #include <cstdlib>
 #include <random>
-#include <ef/elias_fano.h>
+#include "ef/elias_fano.h"
 
 std::pair<unsigned int, unsigned int> get_min_max(const std::vector<unsigned int> times);
 std::vector<std::string> split(const std::string &s, char delim);
@@ -18,6 +18,7 @@ int get_proportionally_random_node(std::vector<double> out_degrees);
 int double_binary_search(std::vector<double> out_degrees, int left, int right, double target);
 double get_variance(std::vector<unsigned int> times, double average);
 std::vector<int> get_proportionally_random_nodes(std::vector<double> out_degrees, int count);
+std::vector<int> get_proportionally_random_node_list(elias_fano ef, unsigned int nodes, int count);
 
 std::vector<uint64_t> build_prefixed_out_degree_array(const sdsl::k2_tree<2> &tree, unsigned int nodes);
 elias_fano build_ef_from_k2tree(const sdsl::k2_tree<2> &tree, unsigned int nodes);
