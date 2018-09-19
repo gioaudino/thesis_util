@@ -206,7 +206,7 @@ std::pair<unsigned int,unsigned long> get_nodes_arcs(const std::string basename)
 
 std::pair<unsigned int, unsigned int> get_min_max(const std::vector<unsigned int> times){
     if(times.empty())
-        return NULL;
+        return std::make_pair(-1, -1);
     int min = times[0], max = times[0];
     for(int t: times){
         if(t < min) min = t;
