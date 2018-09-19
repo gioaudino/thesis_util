@@ -118,7 +118,7 @@ int main(int argc, char** argv){
             time_end = std::clock();
             times[c] = get_cpu_time(time_start, time_end, 6);
         }
-        const volatile unused = prevent;
+        const volatile int unused = prevent;
         int sum = 0;
         for(int t: times){
             sum += t;
@@ -142,7 +142,7 @@ int main(int argc, char** argv){
     for(int count: counts){
         std::vector<unsigned int> times(count,0);
         std::vector<int> random_nodes = get_proportionally_random_nodes(out_degrees, count);
-        int prevent = 0
+        int prevent = 0;
         for(int c = 0; c < count; c++){
             time_start = std::clock();
             for(long unsigned int n: k2.neigh(random_nodes[c])){
@@ -151,7 +151,7 @@ int main(int argc, char** argv){
             time_end = std::clock();
             times[c] = get_cpu_time(time_start, time_end, 6);
         }
-        const volatile unused = prevent;
+        const volatile int unused = prevent;
         int sum = 0;
         for(int t: times){
             sum += t;
