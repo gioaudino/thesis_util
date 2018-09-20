@@ -9,8 +9,6 @@
 #include <random>
 #include "ef/elias_fano.h"
 
-#define MU '\u03BC';
-
 std::pair<unsigned int, unsigned int> get_min_max(const std::vector<unsigned int> times);
 std::vector<std::string> split(const std::string &s, char delim);
 std::pair<unsigned int,unsigned long> get_nodes_arcs(const std::string basename);
@@ -29,6 +27,8 @@ uint64_t micros();
 uint64_t millis();
 
 const std::vector<int> counts = {10,100,1000,10000};
+const char MU = '\u03BC';
+
 int main(int argc, char** argv){
     if(argc < 3){
         std::cout << "Usage: " << argv[0] << "<output_basename> <original_basename>" << std::endl;
