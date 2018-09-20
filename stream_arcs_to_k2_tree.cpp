@@ -27,7 +27,7 @@ uint64_t micros();
 uint64_t millis();
 
 const std::vector<int> counts = {10,100,1000,10000};
-const char MU = '\u03BC';
+const std::string MU = "\u03BC";
 
 int main(int argc, char** argv){
     if(argc < 3){
@@ -219,7 +219,7 @@ int main(int argc, char** argv){
         double variance = get_variance(times, avg);
         std::cout << "Adjacency @ " << count << std::endl;
         std::cout << "avg: " << avg << " ns" << " - min " << min_max.first << " \u03BCs - max " << min_max.second << " ns - variance: " << variance << " - std dev: " << sqrt(variance) << std::endl;
-        properties_out << "adjacency_" << count << "_avg=" << avg << " ns" << std::endl;n
+        properties_out << "adjacency_" << count << "_avg=" << avg << " ns" << std::endl;
         properties_out << "adjacency_" << count << "_min=" << min_max.first << " ns" << std::endl;
         properties_out << "adjacency_" << count << "_max=" << min_max.second << " ns" << std::endl;
         properties_out << "adjacency_" << count << "_variance=" << variance << std::endl;
