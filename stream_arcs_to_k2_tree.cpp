@@ -22,6 +22,9 @@ std::vector<uint64_t> build_prefixed_out_degree_array(const sdsl::k2_tree<2> &tr
 elias_fano build_ef_from_k2tree(const sdsl::k2_tree<2> &tree, unsigned int nodes);
 elias_fano get_ef_from_out_degree_array(std::vector<uint64_t> sum_out_degrees);
 
+uint64_t nanos();
+uint64_t millis();
+
 const std::vector<int> counts = {10,100,1000,10000};
 int main(int argc, char** argv){
     if(argc < 3){
@@ -61,16 +64,16 @@ int main(int argc, char** argv){
     std::cout << "Graph loaded. Compressing..." << std::endl;
 
     // START MEASURING COMPRESSION TIME
-    std::clock_t time_start = std::clock();
+    uint64_t time_start = millis();
     sdsl::k2_tree<2> k2;
     k2 = sdsl::k2_tree<2>(arc_vector, nodes);
 
     auto written = k2.serialize(outfile);
 
     // END OF COMPRESSION TIME MEASURE
-    std::clock_t time_end = std::clock();
+    uint64_t time_end = millis();
 
-    long double compression_time = get_cpu_time(time_start, time_end);
+    uint64_t compression_time = time_end - time_start;
 
 
     std::cout << "Graph compressed in " << compression_time << " ms" << std::endl;
@@ -88,19 +91,19 @@ int main(int argc, char** argv){
     // START - SEQUENTIAL SCAN
 
     int keep = 0;
-    time_start = std::clock();
+    time_start = millis();
     for(index = 0; index < nodes; index++){
         for(long unsigned int node: k2.neigh(index)){
             keep ^= node;
         }
     }
-    time_end = std::clock();
+    time_end = millis();
     const volatile int ignored = keep;
     // END - SEQUENTIAL SCAN
 
 
-    long double sequential_scan_time = get_cpu_time(time_start, time_end, 6)/arcs;
-    long double edges_per_second = (double) arcs / get_cpu_time(time_start, time_end, 1);
+    long double sequential_scan_time = (double)(time_end-time_start)/arcs;
+    long double edges_per_second = (double) arcs / (1000*(time_end-time_start));
 
     std::cout << "Sequential scan completed: " << sequential_scan_time << " ns per link - " << edges_per_second << " links per s" << std::endl << std::endl;
     properties_out << "sequential_scan_time_nspl=" << sequential_scan_time << " ns/link" << std::endl;
@@ -114,17 +117,17 @@ int main(int argc, char** argv){
     std::uniform_int_distribution<int> dist(0, nodes);
 
     for(int count: counts){
-        std::clock_t time_0, time_1;
+        uint64_t time_0, time_1;
         std::vector<unsigned int> times(count,0);
         int prevent = 0;
         for(int c = 0; c < count; c++){
             unsigned int node = dist(gen);
-            time_0 = std::clock();
+            time_0 = nanos();
             for(long unsigned int n: k2.neigh(node)){
                 prevent ^= n;
             }
-            time_1 = std::clock();
-            times[c] = get_cpu_time(time_0, time_1, 6);
+            time_1 = nanos();
+            times[c] = time_1 - time_0;
         }
         const volatile int unused = prevent;
 
@@ -155,17 +158,17 @@ int main(int argc, char** argv){
     elias_fano ef = build_ef_from_k2tree(k2, nodes);
 
     for(int count: counts){
-        std::clock_t time_0, time_1;
+        uint64_t time_0, time_1;
         std::vector<unsigned int> times(count,0);
         std::vector<int> random_nodes = get_proportionally_random_nodes(ef, arcs, count);
         int prevent = 0;
         for(int c = 0; c < count; c++){
-            time_0 = std::clock();
+            time_0 = nanos();
             for(long unsigned int n: k2.neigh(random_nodes[c])){
                 keep ^= n;
             }
-            time_1 = std::clock();
-            times[c] = get_cpu_time(time_0, time_1, 6);
+            time_1 = nanos();
+            times[c] = time_1 - time_0;
         }
         const volatile int unused = prevent;
 
@@ -198,13 +201,13 @@ int main(int argc, char** argv){
     for(int count: counts){
         std::vector<unsigned int> times(count,0);
         bool acc = false;
-        std::clock_t time_0, time_1;
+        uint64_t time_0, time_1;
         for(int i=0; i<count; i++){
             int j = distribution(random_generator), k = distribution(random_generator);
-            time_0 = std::clock();
+            time_0 = nanos();
             acc &= k2.adj(j, k);
-            time_1 = std::clock();
-            times[i] = get_cpu_time(time_0, time_1, 6);
+            time_1 = nanos();
+            times[c] = time_1 - time_0;
         }
         const volatile bool r = acc;
 
@@ -212,13 +215,12 @@ int main(int argc, char** argv){
         double avg = get_mean(times);
         double variance = get_variance(times, avg);
         std::cout << "Adjacency @ " << count << std::endl;
-        std::cout << "avg: " << avg << " ns" << " - min " << min_max.first << " ns - max " << min_max.second << " ns - variance: " << variance << " - std dev: " << sqrt(variance) << std::endl;
-        properties_out << "adjacency_" << count << "_avg=" << avg << " ns" << std::endl;
-        properties_out << "adjacency_" << count << "_min=" << min_max.first << " ns" << std::endl;
-        properties_out << "adjacency_" << count << "_max=" << min_max.second << " ns" << std::endl;
+        std::cout << "avg: " << avg << " ps" << " - min " << min_max.first << " \u03BCs - max " << min_max.second << " \u03BCs - variance: " << variance << " - std dev: " << sqrt(variance) << std::endl;
+        properties_out << "adjacency_" << count << "_avg=" << avg << " \u03BCs" << std::endl;
+        properties_out << "adjacency_" << count << "_min=" << min_max.first << " \u03BCs" << std::endl;
+        properties_out << "adjacency_" << count << "_max=" << min_max.second << " \u03BCs" << std::endl;
         properties_out << "adjacency_" << count << "_variance=" << variance << std::endl;
         properties_out << "adjacency_" << count << "_stddev=" << sqrt(variance) << std::endl;
-
     }
 
 
@@ -321,4 +323,16 @@ double get_mean(std::vector<unsigned int> times){
         sum += t;
     }
     return (double) sum / (double) times.size();
+}
+
+uint64_t nanos() {
+    uint64_t ns = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::
+                  now().time_since_epoch()).count();
+    return ns;
+}
+
+uint64_t millis() {
+    uint64_t ms = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::
+                  now().time_since_epoch()).count();
+    return ms;
 }
