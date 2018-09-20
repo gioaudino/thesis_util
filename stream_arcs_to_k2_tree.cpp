@@ -9,6 +9,8 @@
 #include <random>
 #include "ef/elias_fano.h"
 
+#define MU '\u03BC';
+
 std::pair<unsigned int, unsigned int> get_min_max(const std::vector<unsigned int> times);
 std::vector<std::string> split(const std::string &s, char delim);
 std::pair<unsigned int,unsigned long> get_nodes_arcs(const std::string basename);
@@ -23,6 +25,7 @@ elias_fano build_ef_from_k2tree(const sdsl::k2_tree<2> &tree, unsigned int nodes
 elias_fano get_ef_from_out_degree_array(std::vector<uint64_t> sum_out_degrees);
 
 uint64_t nanos();
+uint64_t micros();
 uint64_t millis();
 
 const std::vector<int> counts = {10,100,1000,10000};
@@ -122,11 +125,11 @@ int main(int argc, char** argv){
         int prevent = 0;
         for(int c = 0; c < count; c++){
             unsigned int node = dist(gen);
-            time_0 = nanos();
+            time_0 = micros();
             for(long unsigned int n: k2.neigh(node)){
                 prevent ^= n;
             }
-            time_1 = nanos();
+            time_1 = micros();
             times[c] = time_1 - time_0;
         }
         const volatile int unused = prevent;
@@ -135,10 +138,10 @@ int main(int argc, char** argv){
         double variance = get_variance(times, avg);
         auto min_max = get_min_max(times);
         std::cout << "Random scan @ " << count << std::endl;
-        std::cout << "avg: " << avg << " ns" << " - min " << min_max.first << " ns - max " << min_max.second << " ns - variance: " << variance << " - std dev: " << sqrt(variance) << std::endl;
-        properties_out << "random_" << count << "_avg=" << avg << " ns" << std::endl;
-        properties_out << "random_" << count << "_min=" << min_max.first << " ns" << std::endl;
-        properties_out << "random_" << count << "_max=" << min_max.second << " ns" << std::endl;
+        std::cout << "avg: " << avg << " " << MU << "s - min " << min_max.first << " " << MU << "s - max " << min_max.second << " " << MU << "s - variance: " << variance << " - std dev: " << sqrt(variance) << std::endl;
+        properties_out << "random_" << count << "_avg=" << avg << " " << MU << "s" << std::endl;
+        properties_out << "random_" << count << "_min=" << min_max.first << " " << MU << "s" << std::endl;
+        properties_out << "random_" << count << "_max=" << min_max.second << " " << MU << "s" << std::endl;
         properties_out << "random_" << count << "_variance=" << variance << std::endl;
         properties_out << "random_" << count << "_stddev=" << sqrt(variance) << std::endl;
 
@@ -163,11 +166,11 @@ int main(int argc, char** argv){
         std::vector<int> random_nodes = get_proportionally_random_nodes(ef, arcs, count);
         int prevent = 0;
         for(int c = 0; c < count; c++){
-            time_0 = nanos();
+            time_0 = micros();
             for(long unsigned int n: k2.neigh(random_nodes[c])){
                 keep ^= n;
             }
-            time_1 = nanos();
+            time_1 = micros();
             times[c] = time_1 - time_0;
         }
         const volatile int unused = prevent;
@@ -176,10 +179,10 @@ int main(int argc, char** argv){
         double avg = get_mean(times);
         double variance = get_variance(times, avg);
         std::cout << "Proportionally random scan @ " << count << std::endl;
-        std::cout << "avg: " << avg << " ns" << " - min " << min_max.first << " ns - max " << min_max.second << " ns - variance: " << variance << " - std dev: " << sqrt(variance) << std::endl;
-        properties_out << "proportionally_random_" << count << "_avg=" << avg << " ns" << std::endl;
-        properties_out << "proportionally_random_" << count << "_min=" << min_max.first << " ns" << std::endl;
-        properties_out << "proportionally_random_" << count << "_max=" << min_max.second << " ns" << std::endl;
+        std::cout << "avg: " << avg << " " << MU << "s - min " << min_max.first << " " << MU << "s - max " << min_max.second << " " << MU << "s - variance: " << variance << " - std dev: " << sqrt(variance) << std::endl;
+        properties_out << "proportionally_random_" << count << "_avg=" << avg << " " << MU << "s" << std::endl;
+        properties_out << "proportionally_random_" << count << "_min=" << min_max.first << " " << MU << "s" << std::endl;
+        properties_out << "proportionally_random_" << count << "_max=" << min_max.second << " " << MU << "s" << std::endl;
         properties_out << "proportionally_random_" << count << "_variance=" << variance << std::endl;
         properties_out << "proportionally_random_" << count << "_stddev=" << sqrt(variance) << std::endl;
 
@@ -207,7 +210,7 @@ int main(int argc, char** argv){
             time_0 = nanos();
             acc &= k2.adj(j, k);
             time_1 = nanos();
-            times[c] = time_1 - time_0;
+            times[i] = time_1 - time_0;
         }
         const volatile bool r = acc;
 
@@ -215,10 +218,10 @@ int main(int argc, char** argv){
         double avg = get_mean(times);
         double variance = get_variance(times, avg);
         std::cout << "Adjacency @ " << count << std::endl;
-        std::cout << "avg: " << avg << " ps" << " - min " << min_max.first << " \u03BCs - max " << min_max.second << " \u03BCs - variance: " << variance << " - std dev: " << sqrt(variance) << std::endl;
-        properties_out << "adjacency_" << count << "_avg=" << avg << " \u03BCs" << std::endl;
-        properties_out << "adjacency_" << count << "_min=" << min_max.first << " \u03BCs" << std::endl;
-        properties_out << "adjacency_" << count << "_max=" << min_max.second << " \u03BCs" << std::endl;
+        std::cout << "avg: " << avg << " ns" << " - min " << min_max.first << " \u03BCs - max " << min_max.second << " ns - variance: " << variance << " - std dev: " << sqrt(variance) << std::endl;
+        properties_out << "adjacency_" << count << "_avg=" << avg << " ns" << std::endl;n
+        properties_out << "adjacency_" << count << "_min=" << min_max.first << " ns" << std::endl;
+        properties_out << "adjacency_" << count << "_max=" << min_max.second << " ns" << std::endl;
         properties_out << "adjacency_" << count << "_variance=" << variance << std::endl;
         properties_out << "adjacency_" << count << "_stddev=" << sqrt(variance) << std::endl;
     }
@@ -329,6 +332,12 @@ uint64_t nanos() {
     uint64_t ns = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::
                   now().time_since_epoch()).count();
     return ns;
+}
+
+uint64_t micros() {
+    uint64_t ms = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::
+                  now().time_since_epoch()).count();
+    return ms;
 }
 
 uint64_t millis() {
