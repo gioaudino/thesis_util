@@ -168,7 +168,7 @@ int main(int argc, char** argv){
         for(int c = 0; c < count; c++){
             time_0 = micros();
             for(long unsigned int n: k2.neigh(random_nodes[c])){
-                keep ^= n;
+                prevent ^= n;
             }
             time_1 = micros();
             times[c] = time_1 - time_0;
