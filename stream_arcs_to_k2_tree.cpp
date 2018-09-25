@@ -79,7 +79,7 @@ int main(int argc, char** argv){
     uint64_t compression_time = time_end - time_start;
 
 
-    std::cout << "Graph compressed in " << compression_time << " ms" << std::endl;
+    std::cout << std::endl << "Graph compressed in " << compression_time << " ms" << std::endl;
 
     outfile.close();
     double bpe = 8*written/((double)arcs);
