@@ -1,7 +1,7 @@
-/*		 
+/*
  * Sux: Succinct data structures
  *
- * Copyright (C) 2007-2013 Sebastiano Vigna 
+ * Copyright (C) 2007-2013 Sebastiano Vigna
  *
  *  This library is free software; you can redistribute it and/or modify it
  *  under the terms of the GNU Lesser General Public License as published by the Free
@@ -53,7 +53,7 @@ private:
 		return ( total_offset <= 64 ? result : result | bits[ start_word + 1 ] << 64 - start_bit ) & ( 1ULL << width ) - 1;
 	}
 
-	__inline static void set_bits( uint64_t * const bits, const uint64_t start, const int width, const uint64_t value ) { 
+	__inline static void set_bits( uint64_t * const bits, const uint64_t start, const int width, const uint64_t value ) {
 			const uint64_t start_word = start / 64;
 			const uint64_t end_word = ( start + width - 1 ) / 64;
 			const uint64_t start_bit = start % 64;
@@ -75,7 +75,7 @@ public:
 	elias_fano( const uint64_t * const bits, const uint64_t num_bits );
 	elias_fano( const std::vector<uint64_t> pos, const uint64_t num_bits );
 	~elias_fano();
-	uint64_t rank( const uint64_t pos );
+	uint64_t rank( const uint64_t pos ) const;
 	uint64_t select( const uint64_t rank );
 	uint64_t select( const uint64_t rank, uint64_t * const next );
 	// Just for analysis purposes

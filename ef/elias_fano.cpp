@@ -1,7 +1,7 @@
-/*		 
+/*
  * Sux: Succinct data structures
  *
- * Copyright (C) 2007-2013 Sebastiano Vigna 
+ * Copyright (C) 2007-2013 Sebastiano Vigna
  *
  *  This library is free software; you can redistribute it and/or modify it
  *  under the terms of the GNU Lesser General Public License as published by the Free
@@ -76,7 +76,7 @@ elias_fano::elias_fano( const uint64_t * const bits, const uint64_t num_bits ) {
 
 	compressor = 0;
 	for( int i = 0; i < block_size; i++) compressor |= 1ULL << ( l - 1 ) * i + block_size;
-	
+
 	lower_l_bits_mask = ( 1ULL << l ) - 1;
 
 #ifndef NDEBUG
@@ -147,7 +147,7 @@ elias_fano::elias_fano( const std::vector<uint64_t> ones, const uint64_t num_bit
 
 	compressor = 0;
 	for( int i = 0; i < block_size; i++) compressor |= 1ULL << ( l - 1 ) * i + block_size;
-	
+
 	lower_l_bits_mask = ( 1ULL << l ) - 1;
 
 #ifndef NDEBUG
@@ -186,7 +186,7 @@ elias_fano::~elias_fano() {
 	delete selectz_upper;
 }
 
-uint64_t elias_fano::rank( const uint64_t k ) {
+uint64_t elias_fano::rank( const uint64_t k ) const {
 	if ( num_ones == 0 ) return 0;
 	if ( k >= num_bits ) return num_ones;
 #ifdef DEBUG
@@ -205,9 +205,9 @@ uint64_t elias_fano::rank( const uint64_t k ) {
 	const uint64_t k_lower_bits = k & lower_l_bits_mask;
 
 	do {
-		rank--; 
+		rank--;
 		rank_times_l -= l;
-		pos--; 
+		pos--;
 	} while( pos >= 0 && ( upper_bits[ pos / 64 ] & 1ULL << pos % 64 ) && get_bits( lower_bits, rank_times_l, l ) >= k_lower_bits );
 
 	return ++rank;
@@ -230,7 +230,7 @@ uint64_t elias_fano::rank( const uint64_t k ) {
 #endif
 
 	uint64_t block_upper_bits, block_lower_bits;
-	
+
 	while ( rank > block_size ) {
 		rank -= block_size;
 		rank_times_l -= block_length;
