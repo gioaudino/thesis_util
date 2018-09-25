@@ -16,7 +16,7 @@ long double get_cpu_time(std::clock_t time_start, std::clock_t time_end, unsigne
 std::vector<double> create_out_degree_array(const sdsl::k2_tree<2> &tree, unsigned int nodes, unsigned long arcs);
 double get_variance(std::vector<unsigned int> times, double average);
 double get_mean(std::vector<unsigned int> times);
-std::vector<int> get_proportionally_random_nodes(elias_fano ef, unsigned long nodes, int count);
+std::vector<uint64_t> get_proportionally_random_nodes(const elias_fano ef, unsigned long nodes, int count);
 
 std::vector<uint64_t> build_prefixed_out_degree_array(const sdsl::k2_tree<2> &tree, unsigned int nodes);
 elias_fano build_ef_from_k2tree(const sdsl::k2_tree<2> &tree, unsigned int nodes);
@@ -159,11 +159,19 @@ int main(int argc, char** argv){
     // std::vector<double> out_degrees = create_out_degree_array(k2, nodes, arcs);
 
     elias_fano ef = build_ef_from_k2tree(k2, nodes);
+    std::cout << "Elias Fano compressed list built" << std::endl;
 
     for(int count: counts){
         uint64_t time_0, time_1;
         std::vector<unsigned int> times(count,0);
-        std::vector<int> random_nodes = get_proportionally_random_nodes(ef, arcs, count);
+        std::vector<uint64_t> random_nodes = get_proportionally_random_nodes(ef, arcs, count);
+        std::cout << "Created random node list" << std::endl;
+        //
+        // for(int el: random_nodes){
+        //     std::cout << el << " ";
+        // }
+        // std::cout << std::endl;
+
         int prevent = 0;
         for(int c = 0; c < count; c++){
             time_0 = micros();
@@ -283,31 +291,53 @@ std::vector<std::string> split(const std::string &s, char delim) {
 }
 
 std::vector<uint64_t> build_prefixed_out_degree_array(const sdsl::k2_tree<2> &tree, unsigned int nodes){
+    uint64_t a = millis();
     std::vector<uint64_t> out_degrees(nodes, 0);
+    uint64_t b = millis();
+
+    // std::cout << "Array allocated in " << b-a << "ms" << std::endl;
+    a = millis();
     out_degrees[0] = tree.neigh(0).size();
     int index, sum = 0;
     for(index = 1; index < nodes; index++){
         out_degrees[index] = out_degrees[index-1] + tree.neigh(index).size();
     }
+    b = millis();
+    std::cout << "Prefixed sum filled in " << b-a << "ms" << std::endl;
+
     return out_degrees;
 }
 
 elias_fano get_ef_from_out_degree_array(std::vector<uint64_t> sum_out_degrees){
-    return elias_fano(sum_out_degrees, sum_out_degrees[sum_out_degrees.size()-1]+1);
+    uint64_t a = millis();
+    auto res = elias_fano(sum_out_degrees, sum_out_degrees[sum_out_degrees.size()-1]+1);
+    uint64_t b = millis();
+
+    std::cout << "EF built in " << b-a << "ms" << std::endl;
+    return res;
 }
 
 elias_fano build_ef_from_k2tree(const sdsl::k2_tree<2> &tree, unsigned int nodes){
     return get_ef_from_out_degree_array(build_prefixed_out_degree_array(tree, nodes));
 }
 
-std::vector<int> get_proportionally_random_nodes(elias_fano ef, unsigned long arcs, int count){
+std::vector<uint64_t> get_proportionally_random_nodes(const elias_fano ef, unsigned long arcs, int count){
+    // std::cout << "Requesting " << count << " random nodes out of " << arcs << " arcs" << std::endl;
     std::random_device seed;
+    // std::cout << "ALPHA" << std::endl;
     std::mt19937 gen(seed());
+    // std::cout << "BRAVO" << std::endl;
     std::uniform_int_distribution<int> dist(0, arcs);
-
-    std::vector<int> random_nodes(count, 0);
+    // std::cout << "CHARLIE" << std::endl;
+    std::vector<uint64_t> random_nodes(count, 0);
+    // std::cout << "DELTA" << std::endl;
     for(int i=0; i < count; i++){
-        random_nodes[i] = ef.rank(dist(gen));
+        // std::cout << "ECHO " << i << std::endl;
+        uint64_t r = dist(gen);
+        // std::cout << "FOXTROT " << i << " | " << r << std::endl;
+        uint64_t node = ef.rank(r);
+        // std::cout << "Generated random number: " << r << " whose rank is " << node << std::endl;
+        random_nodes[i] = node;
     }
     return random_nodes;
 }
