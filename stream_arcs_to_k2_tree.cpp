@@ -51,7 +51,7 @@ int main(int argc, char** argv){
 
     properties_out << "arcs=" << arcs << std::endl;
     properties_out << "nodes=" << nodes << std::endl;
-
+    time_t time_begin = time(0);
     arc_vector = std::vector<std::tuple<long unsigned int, long unsigned int>>(arcs);
     while (std::cin >> x >> y){
         if(index % 1000000 == 0){
@@ -239,6 +239,7 @@ int main(int argc, char** argv){
     std::cout << std::endl << "Written " << written << " bytes: " << 8*written << " bits - " << bpe << " bpe"<< std::endl;
     std::cout << "compression time: " << compression_time << " ms - sequential scan time: " << sequential_scan_time << " ns/link" << std::endl;
     time_t t = time(0);
+    std::cout << "Started at " << ctime(&time_begin) << std::endl;
     std::cout << "Finished at " << ctime(&t) << std::endl;
 }
 
