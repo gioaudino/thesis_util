@@ -56,7 +56,7 @@ int main(int argc, char** argv){
     while (std::cin >> x >> y){
         if(index % 1000000 == 0){
             time_t now = time(0);
-            std::string now_str(ctime(&now))
+            std::string now_str(ctime(&now));
             std::cout << now_str.substr(0, now_str.length() - 1) << "\t" << index << "/" << arcs << " arcs - " << 100*index/arcs << "\%" << std::endl;
         }
         arc_vector[index++] = std::make_tuple(x,y);

@@ -8,10 +8,10 @@ fi
 graphs=("enwiki-2015")
 WD=$(pwd)
 
-for graph in "${graphs[@]}":
+for graph in "${graphs[@]}"
 do
     mkdir $graph
     cd $graph
-    $1/run_k2tree $1 $DATASETS/$graph/$graph-hc $graph
+    $1/run_k2tree.sh $1 $DATASETS/$graph/$graph-hc $graph
     cd $WD
 done
