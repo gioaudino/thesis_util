@@ -5,13 +5,14 @@ if [[ $# -lt 1 ]]; then
     exit 1
 fi
 
-graphs=("enwiki-2015")
+graphs=("enwiki-2016" "enwiki-2017")
 WD=$(pwd)
 
 for graph in "${graphs[@]}"
 do
     mkdir $graph
     cd $graph
+    rm -rf *
     $1/run_k2tree.sh $1 $DATASETS/$graph/$graph-hc $graph
     cd $WD
 done
