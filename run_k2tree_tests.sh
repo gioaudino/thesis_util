@@ -5,7 +5,7 @@ if [[ $# -lt 1 ]]; then
     exit 1
 fi
 
-graphs=("enwiki-2016" "enwiki-2017")
+graphs=( "enwiki-2015" "enwiki-2016" "enwiki-2017" "enwiki-2018" "eu-2015-host" "facebook" "gsh-2015-host" "twitter-2010" "uk-2014-host")
 WD=$(pwd)
 
 for graph in "${graphs[@]}"
