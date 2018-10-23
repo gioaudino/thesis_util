@@ -46,17 +46,18 @@ int main(int argc, char** argv){
     arcs = nodes_arcs.second;
 
     std::string prop(argv[1]);
-    prop.append(".properties");
-    std::ofstream properties_out(prop);
+    prop.append(".result");
+    std::ofstream result_outstream(prop);
 
-    properties_out << "arcs=" << arcs << std::endl;
-    properties_out << "nodes=" << nodes << std::endl;
+    result_outstream << "arcs=" << arcs << std::endl;
+    result_outstream << "nodes=" << nodes << std::endl;
     time_t time_begin = time(0);
     arc_vector = std::vector<std::tuple<long unsigned int, long unsigned int>>(arcs);
     while (std::cin >> x >> y){
         if(index % 1000000 == 0){
             time_t now = time(0);
-            std::cout << ctime(&now) << "\t" << index << "/" << arcs << " arcs - " << 100*index/arcs << "\%" << std::endl;
+            std::string now_str(ctime(&now))
+            std::cout << now_str.substr(0, now_str.length() - 1) << "\t" << index << "/" << arcs << " arcs - " << 100*index/arcs << "\%" << std::endl;
         }
         arc_vector[index++] = std::make_tuple(x,y);
     }
@@ -84,8 +85,8 @@ int main(int argc, char** argv){
     outfile.close();
     double bpe = 8*written/((double)arcs);
     std::setprecision(3);
-    properties_out << "bitsperlink=" << bpe << std::endl;
-    properties_out << "compression_time=" << compression_time << " ms" << std::endl;
+    result_outstream << "bitsperlink=" << bpe << std::endl;
+    result_outstream << "compression_time=" << compression_time << " ms" << std::endl;
 
 
 
@@ -109,8 +110,8 @@ int main(int argc, char** argv){
     long double edges_per_second = (double) arcs / (1000*(time_end-time_start));
 
     std::cout << "Sequential scan completed: " << sequential_scan_time << " ns per link - " << edges_per_second << " links per s" << std::endl << std::endl;
-    properties_out << "sequential_scan_time_nspl=" << sequential_scan_time << " ns/link" << std::endl;
-    properties_out << "sequential_scan_time_lps=" << edges_per_second << " link/s" << std::endl;
+    result_outstream << "sequential_scan_time_nspl=" << sequential_scan_time << " ns/link" << std::endl;
+    result_outstream << "sequential_scan_time_lps=" << edges_per_second << " link/s" << std::endl;
 
 
     std::cout << "Analyzing list scan with randomly selected nodes" << std::endl;
@@ -139,11 +140,11 @@ int main(int argc, char** argv){
         auto min_max = get_min_max(times);
         std::cout << "Random scan @ " << count << std::endl;
         std::cout << "avg: " << avg << " " << MU << "s - min " << min_max.first << " " << MU << "s - max " << min_max.second << " " << MU << "s - variance: " << variance << " - std dev: " << sqrt(variance) << std::endl;
-        properties_out << "random_" << count << "_avg=" << avg << " " << MU << "s" << std::endl;
-        properties_out << "random_" << count << "_min=" << min_max.first << " " << MU << "s" << std::endl;
-        properties_out << "random_" << count << "_max=" << min_max.second << " " << MU << "s" << std::endl;
-        properties_out << "random_" << count << "_variance=" << variance << std::endl;
-        properties_out << "random_" << count << "_stddev=" << sqrt(variance) << std::endl;
+        result_outstream << "random_" << count << "_avg=" << avg << " " << MU << "s" << std::endl;
+        result_outstream << "random_" << count << "_min=" << min_max.first << " " << MU << "s" << std::endl;
+        result_outstream << "random_" << count << "_max=" << min_max.second << " " << MU << "s" << std::endl;
+        result_outstream << "random_" << count << "_variance=" << variance << std::endl;
+        result_outstream << "random_" << count << "_stddev=" << sqrt(variance) << std::endl;
 
         // std::string of(std::to_string(count));
         // of.append("random");
@@ -188,11 +189,11 @@ int main(int argc, char** argv){
         double variance = get_variance(times, avg);
         std::cout << "Proportionally random scan @ " << count << std::endl;
         std::cout << "avg: " << avg << " " << MU << "s - min " << min_max.first << " " << MU << "s - max " << min_max.second << " " << MU << "s - variance: " << variance << " - std dev: " << sqrt(variance) << std::endl;
-        properties_out << "proportionally_random_" << count << "_avg=" << avg << " " << MU << "s" << std::endl;
-        properties_out << "proportionally_random_" << count << "_min=" << min_max.first << " " << MU << "s" << std::endl;
-        properties_out << "proportionally_random_" << count << "_max=" << min_max.second << " " << MU << "s" << std::endl;
-        properties_out << "proportionally_random_" << count << "_variance=" << variance << std::endl;
-        properties_out << "proportionally_random_" << count << "_stddev=" << sqrt(variance) << std::endl;
+        result_outstream << "proportionally_random_" << count << "_avg=" << avg << " " << MU << "s" << std::endl;
+        result_outstream << "proportionally_random_" << count << "_min=" << min_max.first << " " << MU << "s" << std::endl;
+        result_outstream << "proportionally_random_" << count << "_max=" << min_max.second << " " << MU << "s" << std::endl;
+        result_outstream << "proportionally_random_" << count << "_variance=" << variance << std::endl;
+        result_outstream << "proportionally_random_" << count << "_stddev=" << sqrt(variance) << std::endl;
 
         // std::string of(std::to_string(count));
         // of.append("prop");
@@ -227,15 +228,15 @@ int main(int argc, char** argv){
         double variance = get_variance(times, avg);
         std::cout << "Adjacency @ " << count << std::endl;
         std::cout << "avg: " << avg << " ns" << " - min " << min_max.first << " \u03BCs - max " << min_max.second << " ns - variance: " << variance << " - std dev: " << sqrt(variance) << std::endl;
-        properties_out << "adjacency_" << count << "_avg=" << avg << " ns" << std::endl;
-        properties_out << "adjacency_" << count << "_min=" << min_max.first << " ns" << std::endl;
-        properties_out << "adjacency_" << count << "_max=" << min_max.second << " ns" << std::endl;
-        properties_out << "adjacency_" << count << "_variance=" << variance << std::endl;
-        properties_out << "adjacency_" << count << "_stddev=" << sqrt(variance) << std::endl;
+        result_outstream << "adjacency_" << count << "_avg=" << avg << " ns" << std::endl;
+        result_outstream << "adjacency_" << count << "_min=" << min_max.first << " ns" << std::endl;
+        result_outstream << "adjacency_" << count << "_max=" << min_max.second << " ns" << std::endl;
+        result_outstream << "adjacency_" << count << "_variance=" << variance << std::endl;
+        result_outstream << "adjacency_" << count << "_stddev=" << sqrt(variance) << std::endl;
     }
 
 
-    properties_out.close();
+    result_outstream.close();
     std::cout << std::endl << "Written " << written << " bytes: " << 8*written << " bits - " << bpe << " bpe"<< std::endl;
     std::cout << "compression time: " << compression_time << " ms - sequential scan time: " << sequential_scan_time << " ns/link" << std::endl;
     time_t t = time(0);
