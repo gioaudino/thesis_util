@@ -6,12 +6,12 @@ WD=$(pwd)
 
 for graph in "${graphs[@]}"
 do
+    mkdir $graph
+    cd $graph
+    rm -rf *
     for algo in "${algorithms[@]}"
     do
-        mkdir $graph
-        cd $graph
-        rm -rf *
         java com.gioaudino.thesis.WebGraphTester $algo $DATASETS/$graph/$graph-hc $graph
-        cd $WD
     done
+    cd $WD
 done
